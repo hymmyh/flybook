@@ -117,10 +117,12 @@ abstract public class ZLPaintContext {
 	private int myStringHeight = -1;
 	public final int getStringHeight() {
 		int stringHeight = myStringHeight;
-		if (stringHeight == -1) {
+		if (stringHeight <= 1) {
 			stringHeight = getStringHeightInternal();
 			myStringHeight = stringHeight;
+//			System.out.println("--131--5------hym-----bug"+myStringHeight);
 		}
+		
 		return stringHeight;
 	}
 	abstract protected int getStringHeightInternal();

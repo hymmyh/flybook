@@ -21,7 +21,7 @@ package org.geometerplus.zlibrary.core.view;
 
 abstract public class ZLView {
 	protected ZLPaintContext myContext = new DummyPaintContext();
-
+	//因为这个初始化导致 字体高度变成1的 hym
 	public final ZLPaintContext getContext() {
 		return myContext;
 	}

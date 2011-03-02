@@ -19,21 +19,27 @@
 
 package org.geometerplus.fbreader.formats.pdb;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.geometerplus.fbreader.formats.txt.SinoDetect;
 
 public class PdbHeader {
 	public final String DocName;
 	public final int Flags;
 	public final String Id;
 	public final int[] Offsets;
-
+	public final String encodingName;
+	public String compressed;//是否压缩过
 	public PdbHeader(InputStream stream) throws IOException {
 		final byte[] buffer = new byte[32];
 		if (stream.read(buffer, 0, 32) != 32) {
 			throw new IOException("PdbHeader: cannot reader document name");
 		}
-		DocName = new String(buffer);
+		int enc = new SinoDetect().detectEncoding(buffer);
+		encodingName=SinoDetect.nicename[enc];
+		DocName = new String(buffer,encodingName).trim();
 		Flags = PdbUtil.readShort(stream);
 
 		PdbUtil.skip(stream, 26);
@@ -49,12 +55,15 @@ public class PdbHeader {
 		if (numRecords <= 0) {
 			throw new IOException("PdbHeader: record number = " + numRecords);
 		}
+//		System.out.println("-pdb hym--"+DocName+"|"+Id);
 		Offsets = new int[numRecords];
 
 		for (int i = 0; i < numRecords; ++i) {
 			Offsets[i] = (int)PdbUtil.readInt(stream);
 			PdbUtil.skip(stream, 4);
+//			System.out.println("-pdb hym--"+PdbUtil.readInt(stream));
 		}
+//		System.out.println("-pdb hym--"+DocName+"|"+numRecords+"|"+Offsets[1]);
 	}
 
 	public final int length() {

@@ -30,12 +30,20 @@ import org.geometerplus.zlibrary.core.options.*;
 import org.geometerplus.zlibrary.text.hyphenation.ZLTextHyphenator;
 import org.geometerplus.zlibrary.text.view.ZLTextWordCursor;
 
+import org.geometerplus.android.fbreader.library.LibraryTopLevelActivity;
 import org.geometerplus.fbreader.bookmodel.BookModel;
 import org.geometerplus.fbreader.library.Library;
 import org.geometerplus.fbreader.library.Book;
 import org.geometerplus.fbreader.library.Bookmark;
 
+import android.content.Intent;
+
 public final class FBReaderApp extends ZLApplication {
+	public static boolean pass=false;
+	public final ZLBooleanOption AllowPasswdAdjustmentOption =
+		new ZLBooleanOption("Options", "AllowPasswdAdjustment", false);
+	public final ZLStringOption PasswdOption =
+		new ZLStringOption("Options", "PasswdOption", "");
 	public final ZLBooleanOption AllowScreenBrightnessAdjustmentOption =
 		new ZLBooleanOption("LookNFeel", "AllowScreenBrightnessAdjustment", true);
 	public final ZLStringOption TextSearchPatternOption =
@@ -143,7 +151,17 @@ public final class FBReaderApp extends ZLApplication {
 			}
 		});
 	}
-
+	public void gotoLib(){
+//		Model.Book=null;
+//		doAction(ActionCode.SHOW_MENU);
+		doAction(ActionCode.SHOW_LIBRARY);
+////		final BookModel model = Reader.Model;
+//		Intent intent = new Intent(myWindow.getApplicationContext(), LibraryTopLevelActivity.class);
+//		if (Model != null && Model.Book != null) {
+//			intent.putExtra(LibraryTopLevelActivity.SELECTED_BOOK_PATH_KEY, Model.Book.File.getPath());
+//		}
+//		myWindow.startActivity(intent);
+	}
 	public void openBook(final Book book, final Bookmark bookmark) {
 		if (book == null) {
 			return;
@@ -239,6 +257,7 @@ public final class FBReaderApp extends ZLApplication {
 	}
 
 	public void gotoBookmark(Bookmark bookmark) {
+		addInvisibleBookmark();
 		final String modelId = bookmark.ModelId;
 		if (modelId == null) {
 			BookTextView.gotoPosition(bookmark);
@@ -290,14 +309,22 @@ public final class FBReaderApp extends ZLApplication {
 		}
 	}
 
-	static enum CancelActionType {
+	public static enum CancelActionType {
+		gotoLib,
 		previousBook,
 		returnTo,
 		close
 	}
-
+	public boolean isGotoLib(CancelActionDescription description ){
+		switch (description.Type) {
+			case gotoLib:
+				return true;
+			
+		}
+		return false;
+	}
 	public static class CancelActionDescription {
-		final CancelActionType Type;
+		public final CancelActionType Type;
 		public final String Title;
 		public final String Summary;
 
@@ -324,16 +351,23 @@ public final class FBReaderApp extends ZLApplication {
 	public List<CancelActionDescription> getCancelActionsList() {
 		myCancelActionsList.clear();
 		final Book previousBook = Library.getPreviousBook();
+		
 		if (previousBook != null) {
 			myCancelActionsList.add(new CancelActionDescription(
 				CancelActionType.previousBook, previousBook.getTitle()
 			));
 		}
 		if (Model != null && Model.Book != null) {
+//			System.out.println("---add book mark----");
 			for (Bookmark bookmark : Bookmark.invisibleBookmarks(Model.Book)) {
+//				System.out.println("---add book mark----"+bookmark.getText());
 				myCancelActionsList.add(new BookmarkDescription(bookmark));
+				
 			}
 		}
+		myCancelActionsList.add(new CancelActionDescription(
+				CancelActionType.gotoLib, null
+			));
 		myCancelActionsList.add(new CancelActionDescription(
 			CancelActionType.close, null
 		));
@@ -347,6 +381,9 @@ public final class FBReaderApp extends ZLApplication {
 
 		final CancelActionDescription description = myCancelActionsList.get(index);
 		switch (description.Type) {
+			case gotoLib:
+				gotoLib();
+				break;
 			case previousBook:
 				openBook(Library.getPreviousBook(), null);
 				break;
@@ -354,7 +391,7 @@ public final class FBReaderApp extends ZLApplication {
 			{
 				final Bookmark b = ((BookmarkDescription)description).Bookmark;
 				b.delete();
-				addInvisibleBookmark();
+//				addInvisibleBookmark();
 				gotoBookmark(b);
 				break;
 			}
@@ -363,7 +400,7 @@ public final class FBReaderApp extends ZLApplication {
 				break;
 		}
 	}
-
+    
 	private void updateInvisibleBookmarksList(Bookmark b) {
 		if (Model.Book != null && b != null) {
 			b.save();
@@ -385,7 +422,7 @@ public final class FBReaderApp extends ZLApplication {
 			));
 		}
 	}
-
+	//怎么添加 这个 返回菜单中的 书签？？？
 	public void addInvisibleBookmark() {
 		if (Model.Book != null && getTextView() == BookTextView) {
 			updateInvisibleBookmarksList(addBookmark(6, false));

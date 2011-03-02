@@ -19,6 +19,7 @@
 
 package org.geometerplus.android.fbreader;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import android.app.*;
@@ -92,6 +93,7 @@ public class BookmarksActivity extends TabActivity implements MenuItem.OnMenuIte
 			}
         
 			myThisBookView = createTab("thisBook", R.id.this_book);
+//			new BookmarksAdapter(myThisBookView, myThisBookBookmarks, true);
 			new BookmarksAdapter(myThisBookView, myThisBookBookmarks, true);
 		} else {
 			findViewById(R.id.this_book).setVisibility(View.GONE);
@@ -281,10 +283,12 @@ public class BookmarksActivity extends TabActivity implements MenuItem.OnMenuIte
 				imageView.setVisibility(View.GONE);
 				textView.setText(bookmark.getText());
 				if (myCurrentBook) {
-					bookTitleView.setVisibility(View.GONE);
+//					bookTitleView.setVisibility(View.GONE);
+					bookTitleView.setVisibility(View.VISIBLE);
+					bookTitleView.setText(bookmark.getBookTitle()+":"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(bookmark.getTime(0)));
 				} else {
 					bookTitleView.setVisibility(View.VISIBLE);
-					bookTitleView.setText(bookmark.getBookTitle());
+					bookTitleView.setText(bookmark.getBookTitle()+":"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(bookmark.getTime(0)));
 				}
 			}
 			return view;

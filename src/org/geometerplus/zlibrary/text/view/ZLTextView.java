@@ -403,6 +403,16 @@ public abstract class ZLTextView extends ZLTextViewBase {
 			return Math.max(0, end);
 		}
 	}
+	private final synchronized int getCurrentPicNumber(int paragraphIndex){
+//		final int paragraphIndex = paragraphCursor.Index;
+		//在这个段落前 有多少 张图片。
+//		---
+		int end = myModel.getCPicNum(""+paragraphIndex);
+		if (end == -1) {
+			end = myModel.getTextLength(myModel.getParagraphsNumber() - 1) - 1;
+		}
+		return Math.max(0, end);
+	}
 	public final synchronized int getScrollbarFullSize() {
 		return sizeOfFullText();
 	}
@@ -604,7 +614,27 @@ public abstract class ZLTextView extends ZLTextViewBase {
 			cursor.moveToParagraph(paragraphIndex);
 			wordIndex = cursor.getParagraphCursor().getParagraphLength();
 		}
-
+		int txtnum=computeTextPageNumber(intTextSize)+getCurrentPicNumber(paragraphIndex);//获得页码
+//		System.out.println("------hym---"+txtnum+"-"+computeTextPageNumber(intTextSize)+"-"+getCurrentPicNumber(paragraphIndex));
+		while(txtnum-page>1){//有问题。可能是图片原因引起
+			if(paragraphIndex>0){
+				paragraphIndex--;
+			}else{
+				break;
+			}
+			txtnum=computeTextPageNumber(intTextSize)+getCurrentPicNumber(paragraphIndex);
+		}
+		//进行比较
+		while(page-txtnum>1){//有问题。可能是图片原因引起
+			if(paragraphIndex<page){
+				paragraphIndex=page;
+			}else if(myModel.getParagraphsNumber()-1>paragraphIndex){
+				paragraphIndex++;
+			}else{
+				break;
+			}
+			txtnum=computeTextPageNumber(intTextSize)+getCurrentPicNumber(paragraphIndex);
+		}
 		gotoPositionByEnd(paragraphIndex, wordIndex, 0);
 	}
 
@@ -747,7 +777,8 @@ public abstract class ZLTextView extends ZLTextViewBase {
 			while (info.EndElementIndex != endIndex) {
 				info = processTextLine(paragraphCursor, info.EndElementIndex, info.EndCharIndex, endIndex);
 				textAreaHeight -= info.Height + info.Descent;
-//				System.out.println("----hym---create page info h:"+info.Height+"--indo d:"+info.Descent);
+//				System.out.println("----hym---create page info h:"+info.Height+"--textAreaHeight:"+textAreaHeight);
+				//hym 02-07发现 有些时候获取的info.Height==1 导致显示错误，
 				if ((textAreaHeight < 0) && (counter > 0)) {
 					break;
 				}

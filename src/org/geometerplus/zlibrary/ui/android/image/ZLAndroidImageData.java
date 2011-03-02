@@ -79,7 +79,7 @@ public abstract class ZLAndroidImageData implements ZLImageData {
 //				myBitmap = decodeWithOptions(options);
 //				if((myRealHeight > maxHeight * coefficient) ||
 //						   (myRealWidth > maxWidth *coefficient)) 
-				if(!ignoreSize){//hym 2010 -01-27 图片都转成 适合的大小 放大一点在手机上看 还是可以的。
+				if(!ignoreSize&&myBitmap != null){//hym 2010 -01-27 图片都转成 适合的大小 放大一点在手机上看 还是可以的。
 					float scaleWidth  = (float) (maxWidth-4) / myRealWidth;  
 					float scaleHeight = (float) (maxHeight-4) / myRealHeight;  
 					Matrix matrix = new Matrix(); 
@@ -95,8 +95,8 @@ public abstract class ZLAndroidImageData implements ZLImageData {
 //					System.out.println("---hym  bmp r size :"+resizeBitmap.getHeight()+"--"+resizeBitmap.getWidth());
 					myBitmap= resizeBitmap ;  
 				}else{//实际大小
-					options.inSampleSize = coefficient;
-					myBitmap = decodeWithOptions(options);
+//					options.inSampleSize = coefficient;
+//					myBitmap = decodeWithOptions(options);
 				}
 				
 				if (myBitmap != null) {

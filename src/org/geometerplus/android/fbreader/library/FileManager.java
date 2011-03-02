@@ -62,9 +62,11 @@ public final class FileManager extends BaseActivity {
 
 		if (myPath == null) {
 			setTitle(myResource.getResource("fileTree").getValue());
-			addItem(Paths.BooksDirectoryOption().getValue(), "fileTreeLibrary");
+			
 			addItem("/", "fileTreeRoot");
 			addItem(Environment.getExternalStorageDirectory().getPath(), "fileTreeCard");
+			//hym 改，把flybook 书库放到下面的位置来。方便手指点击，单手操作（dz ，最上面很难点到）。
+			addItem(Paths.BooksDirectoryOption().getValue(), "fileTreeLibrary");
 			adapter.notifyDataSetChanged();
 		} else {
 			setTitle(myPath);

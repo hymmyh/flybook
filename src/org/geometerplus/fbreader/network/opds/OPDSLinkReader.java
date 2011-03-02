@@ -38,7 +38,7 @@ import org.geometerplus.fbreader.network.atom.ATOMUpdated;
 
 
 public class OPDSLinkReader {
-
+	//hym 从这里 获得 在线书库的 书库列表
 	static final String CATALOGS_URL = "http://data.fbreader.org/catalogs/generic-1.1.xml";
 
 	public static ICustomNetworkLink createCustomLink(int id, String siteName, String title, String summary, String icon, Map<String, String> links) {

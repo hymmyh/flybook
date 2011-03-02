@@ -216,6 +216,7 @@ public final class ZLAndroidPaintContext extends ZLPaintContext {
 		return (int)(myTextPaint.measureText(" ", 0, 1) + 0.5f);
 	}
 	protected int getStringHeightInternal() {
+//		System.out.println("--21u13t4-jjj--3-3----hym-----bug"+myTextPaint.getTextSize());
 		return (int)(myTextPaint.getTextSize() + 0.5f);
 	}
 	protected int getDescentInternal() {

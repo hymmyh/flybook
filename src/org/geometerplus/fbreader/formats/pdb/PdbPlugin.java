@@ -38,6 +38,7 @@ public abstract class PdbPlugin extends FormatPlugin {
 		// TODO: use database instead of option (?)
 		ZLStringOption palmTypeOption = new ZLStringOption(file.getPath(), "PalmType", "");
 		String palmType = palmTypeOption.getValue();
+//		System.out.println("--hym-----"+palmType);
 		if (palmType.length() != 8) {
 			byte[] id = new byte[8];
 			try {

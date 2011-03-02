@@ -62,7 +62,7 @@ public final class ZLAndroidApplicationWindow extends ZLApplicationWindow {
 			myMenuItemMap.put(menuItem, item);
 		}
 	}
-
+	//菜单事件
 	private final MenuItem.OnMenuItemClickListener myMenuListener =
 		new MenuItem.OnMenuItemClickListener() {
 			public boolean onMenuItemClick(MenuItem item) {

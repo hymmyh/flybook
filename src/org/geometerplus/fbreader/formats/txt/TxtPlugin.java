@@ -83,7 +83,7 @@ public class TxtPlugin extends FormatPlugin {
 	public boolean readMetaInfo(Book book) {
 		// 用了确认一下 编码
 		int enc = new SinoDetect().detectEncoding(new File(book.File.getPath()));
-        System.out.println("encoding is 1======"+enc);
+//        System.out.println("encoding is 1======"+enc);
 	    InputStream stream = null;
 	    try {
             stream = book.File.getInputStream();

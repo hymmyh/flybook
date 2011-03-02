@@ -31,6 +31,7 @@ import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
 
 //import org.geometerplus.fbreader.fbreader.DialogInterface;
+import org.geometerplus.fbreader.fbreader.FBReaderApp;
 import org.geometerplus.zlibrary.core.library.ZLibrary;
 import org.geometerplus.zlibrary.core.filesystem.ZLFile;
 import org.geometerplus.zlibrary.core.filesystem.ZLResourceFile;
@@ -61,6 +62,8 @@ public final class ZLAndroidLibrary extends ZLibrary {
 	}
 	//hym 关闭 整个程序
 	public void finish() {
+		final FBReaderApp fbReader = (FBReaderApp)FBReaderApp.Instance();
+		fbReader.pass=false;
 		if ((myActivity != null) && !myActivity.isFinishing()) {
 			myActivity.finish();
 		}

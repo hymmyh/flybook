@@ -103,31 +103,125 @@ public class HtmlReader extends BookReader implements ZLHtmlReader {
 	public void endDocumentHandler() {
 		unsetCurrentTextModel();
 	}
+	public boolean isEnd(String tmpstr){
+//    	if(tmpstr==null||tmpstr.trim().equals("")){
+//    		return true;
+//    	}else{
+    		char laststr = tmpstr.charAt(tmpstr.length()-1);
+    		if(laststr=='。'){
+    			return true;
+    		}
+    		if(laststr=='”'){
+    			return true;
+    		}
+    		if(laststr=='！'){
+    			return true;
+    		}
+    		
+    		if(laststr=='？'){
+    			return true;
+    		}
+    		
+    		if(laststr=='.'){
+    			return true;
+    		}
+    		if(laststr=='!'){
+    			return true;
+    		}
+    		if(laststr=='?'){
+    			return true;
+    		}
 
+    		if(laststr=='」'){
+    			return true;
+    		}
+    		if(laststr==':'){
+    			return true;
+    		}
+    		if(laststr=='：'){
+    			return true;
+    		}
+    		if(laststr=='’'){
+    			return true;
+    		}
+    		if(laststr=='\''){
+    			return true;
+    		}
+    		if(laststr=='"'){
+    			return true;
+    		}
+    		if(laststr=='）'){
+    			return true;
+    		}
+    		if(laststr==')'){
+    			return true;
+    		}
+    		return false;
+//    	}
+    }
 	public void charDataHandler(char[] data, int start, int length) {
-		int count=length;
-		int ss=0;
-		for (int i = 0; i < count; i++) {
-            if (data[i+start] == '\n') {
-                if (ss != i) {
-                	addData(data, start+ss, i - ss,false);
-                    endParagraph();
-                    beginParagraph(ZLTextParagraph.Kind.TEXT_PARAGRAPH);
-                }
-                ss = i + 1;
-            } else if (data[i+start] == '\r') {
-                continue;
-            } else if (data[i+start] == ' ' || data[i+start] == '\t') {
-                data[i+start] = '　';
-                if(i+start-2>=0&&data[i+start-1] == '　'&&data[i+start-2] == '　'){
-                	data[i+start-2] = ' ';
-                }
-            } else {
+		if(Model.Book.getZnFlag()){
+            //智能处理文本，速度慢。
+			String str= new String(data,start,length);
+            String[] strarr=str.split("\n");
+            
+            // 处理文本
+            String ttstr="";
+            for(int i=0;i<strarr.length;i++){
+            	String ttmpstr=strarr[i].trim();
+            	ttmpstr=ttmpstr.replaceAll("　", "");
+            	ttstr+=ttmpstr;           	   	
+            	if(!ttstr.equals("")){
+            		if(ttmpstr.length()>28){//要判断 最后是不是标点符号，来确定是否一个段落，还是txt为了看的方便自己的做的换行。
+            			if(isEnd(ttstr)){
+            				ttstr=ttstr+"\r\n";
+            				addData(ttstr.toCharArray(), 0,ttstr.length(),false);
+	                        endParagraph();
+	                        beginParagraph(ZLTextParagraph.Kind.TEXT_PARAGRAPH);
+	                        ttstr="";
+            			}else{
+            				if(i==strarr.length-1){//到这一段的最后一行了
+            					ttstr=ttstr+"\r\n";
+                				addData(ttstr.toCharArray(), 0,ttstr.length(),false);
+    	                        endParagraph();
+    	                        beginParagraph(ZLTextParagraph.Kind.TEXT_PARAGRAPH);
+    	                        ttstr="";
+                        	}
+            			}
+            		}else{//字数 少 就直接是段落
+                		ttstr=ttstr+"\r\n";
+                		addData(ttstr.toCharArray(), 0,ttstr.length(),false);
+                        endParagraph();
+                        beginParagraph(ZLTextParagraph.Kind.TEXT_PARAGRAPH);
+                        ttstr="";
+            		}
+            	}
             }
-        }
-		if (ss != count) {
-			addData(data, start+ss, count - ss,false);
-        }
+		}else{
+			int count=length;
+			int ss=0;
+			for (int i = 0; i < count; i++) {
+	            if (data[i+start] == '\n') {
+	                if (ss != i) {
+	                	addData(data, start+ss, i - ss,false);
+	                    endParagraph();
+	                    beginParagraph(ZLTextParagraph.Kind.TEXT_PARAGRAPH);
+	                }
+	                ss = i + 1;
+	            } else if (data[i+start] == '\r') {
+	                continue;
+	            } else if (data[i+start] == '　' || data[i+start] == '\t') {
+	                data[i+start] = ' ';
+//	                if(i+start-1>=0&&data[i+start-1] == '　'){
+//	                	data[i+start-1] = ' ';
+//	                }
+	            } else {
+	            }
+	        }
+			if (ss != count) {
+				addData(data, start+ss, count - ss,false);
+	        }
+		}
 //		addData(data, start, length,false);
 //		System.out.println("hym--html-"+length+":"+new String(data, start, length));
 	}
@@ -197,12 +291,12 @@ public class HtmlReader extends BookReader implements ZLHtmlReader {
 	}
 	
 	public final void endElementHandler(String tagName) {
-		System.out.println("hym---html:end->"+tagName);
+//		System.out.println("hym---html:end->"+tagName);
 		if(HtmlTag.getTagByName(tagName)==HtmlTag.PRE)
 			this.preflag=true;
 		if(HtmlTag.getTagByName(tagName)==HtmlTag.BODY&&!preflag){
 			endElementHandler(HtmlTag.PRE);
-			System.out.println("hym---html:add end->"+tagName);
+//			System.out.println("hym---html:add end->"+tagName);
 		}
 		endElementHandler(HtmlTag.getTagByName(tagName));
 	}
@@ -298,7 +392,11 @@ public class HtmlReader extends BookReader implements ZLHtmlReader {
 					if (ref.charAt(0) == '#') {
 						myHyperlinkType = FBTextKind.FOOTNOTE;
 						ref = ref.substring(1);
-					} else {
+					} else if (ref.charAt(0) == '&') {
+						myHyperlinkType = FBTextKind.INTERNAL_HYPERLINK;
+						ref = ref.substring(1); 
+					}
+					else {
 						myHyperlinkType = FBTextKind.EXTERNAL_HYPERLINK;
 					}
 					addHyperlinkControl(myHyperlinkType, ref);

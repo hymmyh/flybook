@@ -22,7 +22,9 @@ package org.geometerplus.fbreader.formats.pdb;
 import java.io.*;
 
 import org.geometerplus.zlibrary.core.filesystem.ZLFile;
+import org.geometerplus.zlibrary.core.image.ZLFileImage;
 import org.geometerplus.zlibrary.core.image.ZLImage;
+import org.geometerplus.zlibrary.core.constants.MimeTypes;
 import org.geometerplus.zlibrary.core.encoding.ZLEncodingCollection;
 import org.geometerplus.zlibrary.core.language.ZLLanguageUtil;
 
@@ -32,7 +34,7 @@ import org.geometerplus.fbreader.bookmodel.BookModel;
 public class MobipocketPlugin extends PdbPlugin {
 	@Override
 	public boolean acceptsFile(ZLFile file) {
-		return super.acceptsFile(file) && (fileType(file) == "BOOKMOBI");
+		return super.acceptsFile(file) && (fileType(file) == "BOOKMOBI"||fileType(file) == "TEXtREAd");
 	}
 
 	@Override
@@ -42,10 +44,19 @@ public class MobipocketPlugin extends PdbPlugin {
 			stream = book.File.getInputStream();
 			final PdbHeader header = new PdbHeader(stream);
 			PdbUtil.skip(stream, header.Offsets[0] + 16 - header.length());
-			if (PdbUtil.readInt(stream) != 0x4D4F4249) /* "MOBI" */ {
+			if(header.Id.equals("TEXtREAd")){
+				book.addAuthor("TEXtREAd");
+				book.setEncoding(header.encodingName);
+				book.setTitle(header.DocName);
+				return true;
+			}
+			long typelong = PdbUtil.readInt(stream);
+			if (typelong != 0x4D4F4249) /* "MOBI" */ {
+				System.out.println("--------hym-mobi--"+typelong);
 				return false;
 			}
 			final int length = (int)PdbUtil.readInt(stream);
+//			System.out.println("--------hym---"+length);
 			PdbUtil.skip(stream, 4);
 			final int encodingCode = (int)PdbUtil.readInt(stream);
 			String encodingName = ZLEncodingCollection.Instance().getEncodingName(encodingCode);
@@ -111,6 +122,8 @@ public class MobipocketPlugin extends PdbPlugin {
 			book.setTitle(new String(titleBuffer, encodingName));
 			return true;
 		} catch (IOException e) {
+			e.printStackTrace();
+			
 			return false;
 		} finally {
 			if (stream != null) {
@@ -125,7 +138,11 @@ public class MobipocketPlugin extends PdbPlugin {
 	@Override
 	public boolean readModel(BookModel model) {
 		try {
-			return new MobipocketHtmlBookReader(model).readBook();
+			if(fileType(model.Book.File) == "TEXtREAd"){
+				return new PdbReader(model).readBook(model.Book.File);
+			}else{
+				return new MobipocketHtmlBookReader(model).readBook();
+			}
 		} catch (IOException e) {
 			//e.printStackTrace();
 			return false;
@@ -202,20 +219,14 @@ public class MobipocketPlugin extends PdbPlugin {
 				coverIndex = thumbIndex;
 			}
 
-			// TODO: implement
-			/*final MobipocketStream mpStream = new MobipocketStream(file);
-
-			int index = pbStream.firstImageLocationIndex(file.path());
-			if (index >= 0) {
-				std::pair<int,int> imageLocation = pbStream.imageLocation(pbStream.header(), index + coverIndex);
-				if ((imageLocation.first > 0) && (imageLocation.second > 0)) {
-					return new ZLFileImage(
-						file,
-						imageLocation.first,
-						imageLocation.second
-					);
+			MobipocketStream myMobipocketStream = new MobipocketStream(file);
+			int start = myMobipocketStream.getImageOffset(coverIndex);
+			if (start >= 0) {
+				int len = myMobipocketStream.getImageLength(coverIndex);
+				if (len > 0) {
+					return new ZLFileImage(MimeTypes.MIME_IMAGE_AUTO, file, start, len);
 				}
-			}*/
+			}
 			return null; 
 		} catch (IOException e) {
 			return null;

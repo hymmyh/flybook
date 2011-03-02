@@ -20,6 +20,7 @@
 package org.geometerplus.fbreader.fbreader;
 
 public interface ActionCode {
+	String Goto_LIBRARY = "gotolibrary";
 	String SHOW_LIBRARY = "library";
 	String SHOW_PREFERENCES = "preferences";
 	String SHOW_BOOK_INFO = "bookInfo";

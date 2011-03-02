@@ -50,6 +50,14 @@ final class ZLZipEntryFile extends ZLArchiveEntryFile {
 					public InputStream getInputStream() throws IOException {
 						return file.getInputStream();
 					}
+					public boolean getZipflag(){
+						String ext=file.getExtension().toLowerCase();
+//						System.out.println("----hym---ext:"+ext);
+						if(ext.equals("zip"))
+							return true;
+						else
+							return false;
+					}
 				});
 				if (file.isCached()) {
 					ourZipFileMap.put(file, zf);

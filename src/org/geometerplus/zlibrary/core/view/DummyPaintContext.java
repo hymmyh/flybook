@@ -53,11 +53,13 @@ final class DummyPaintContext extends ZLPaintContext {
 		return 1;
 	}
 	public int getHeight() {
+//		System.out.println("--1234--------hym-----bug");
 		return 1;
 	}
 	
 	public int getStringWidth(char[] string, int offset, int length) {
-		return 1;
+		System.out.println("--128--------hym-----bug");
+		return 26;
 	}
 
 	protected int getSpaceWidthInternal() {
@@ -65,6 +67,7 @@ final class DummyPaintContext extends ZLPaintContext {
 	}
 
 	protected int getStringHeightInternal() {
+		System.out.println("--1----1----hym-----bug");
 		return 1;
 	}
 

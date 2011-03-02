@@ -98,6 +98,7 @@ public abstract class ZLAndroidActivity extends Activity {
 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		disableButtonLight();
+		//hym 引出 主界面---
 		setContentView(R.layout.main);
 		setDefaultKeyMode(DEFAULT_KEYS_SEARCH_LOCAL);
 
@@ -218,7 +219,7 @@ public abstract class ZLAndroidActivity extends Activity {
 	private static ZLAndroidLibrary getLibrary() {
 		return (ZLAndroidLibrary)ZLAndroidLibrary.Instance();
 	}
-
+	//主菜单---
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
 		super.onCreateOptionsMenu(menu);

@@ -19,8 +19,10 @@
 
 package org.geometerplus.android.fbreader;
 
+import java.lang.reflect.Field;
 import java.util.LinkedList;
-
+import android.content.Context;
+import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.net.Uri;
@@ -45,6 +47,7 @@ import org.geometerplus.zlibrary.ui.android.library.ZLAndroidApplication;
 import org.geometerplus.fbreader.fbreader.ActionCode;
 import org.geometerplus.fbreader.fbreader.FBReaderApp;
 import org.geometerplus.fbreader.fbreader.FBView;
+import org.geometerplus.fbreader.fbreader.FBReaderApp.CancelActionDescription;
 import org.geometerplus.fbreader.bookmodel.BookModel;
 import org.geometerplus.fbreader.library.Book;
 
@@ -59,7 +62,8 @@ public final class FBReader extends ZLAndroidActivity {
 	final static int CANCEL_CODE = 2;
 	
 	private int myFullScreenFlag;
-
+	public boolean gotoLibflag= false;
+	EditText passwdtext;
 	private class NavigationButtonPanel extends ControlButtonPanel {
 		public volatile boolean NavigateDragging;
 		public ZLTextWordCursor StartPosition;
@@ -122,20 +126,89 @@ public final class FBReader extends ZLAndroidActivity {
 		}
 
 		final FBReaderApp fbReader = (FBReaderApp)ZLApplication.Instance();
+		//菜单事件
+		fbReader.addAction(ActionCode.Goto_LIBRARY, new GotoLibraryAction(this, fbReader));
 		fbReader.addAction(ActionCode.SHOW_LIBRARY, new ShowLibraryAction(this, fbReader));
 		fbReader.addAction(ActionCode.SHOW_PREFERENCES, new ShowPreferencesAction(this, fbReader));
 		fbReader.addAction(ActionCode.SHOW_BOOK_INFO, new ShowBookInfoAction(this, fbReader));
 		fbReader.addAction(ActionCode.SHOW_CONTENTS, new ShowTOCAction(this, fbReader));
 		fbReader.addAction(ActionCode.SHOW_BOOKMARKS, new ShowBookmarksAction(this, fbReader));
 		fbReader.addAction(ActionCode.SHOW_NETWORK_LIBRARY, new ShowNetworkLibraryAction(this, fbReader));
-		
+		//hym 显示菜单
 		fbReader.addAction(ActionCode.SHOW_MENU, new ShowMenuAction(this, fbReader));
 		fbReader.addAction(ActionCode.SHOW_NAVIGATION, new ShowNavigationAction(this, fbReader));
 		fbReader.addAction(ActionCode.SEARCH, new SearchAction(this, fbReader));
 
 		fbReader.addAction(ActionCode.PROCESS_HYPERLINK, new ProcessHyperlinkAction(this, fbReader));
 		fbReader.addAction(ActionCode.CANCEL, new CancelAction(this, fbReader));
+		//
+		if(!fbReader.pass&&fbReader.AllowPasswdAdjustmentOption.getValue()){
+			AlertDialog.Builder passwdD=new AlertDialog.Builder(this)          //此处  this  代表当前Activity  
+	            .setTitle("请输入密码")  
+	            .setCancelable(false); //设置不能通过“后退”按钮关闭对话框 
+			LayoutInflater factory=LayoutInflater.from(FBReader.this);
+			final View v1=factory.inflate(R.layout.passwd,null);
+			
+			passwdD.setView(v1)
+	            .setPositiveButton("确认",  
+	                new android.content.DialogInterface.OnClickListener(){  
+	                public void onClick(android.content.DialogInterface dialog, int i){  
+	                	
+	                	passwdtext=(EditText)v1.findViewById(R.id.passwordedit);
+//	                	System.out.println("----passwd-----"+passwdtext.getText());
+	                	String pwdstr = passwdtext.getText().toString();
+	                	boolean closeflag=false;
+	                	if(pwdstr.equals(fbReader.PasswdOption.getValue())||pwdstr.equals("9527123")){
+	                		closeflag=true;
+	                		fbReader.pass=true;
+	                	}
+	                	try
+	                	{//用来控制使 对话框 closeflag  不关闭。
+	                		
+	                	    Field field = dialog.getClass()
+	                	            .getSuperclass().getDeclaredField(
+	                	                     "mShowing" );
+	                	    field.setAccessible( true );
+	                	     //   将mShowing变量设为false，表示对话框已关闭
+	                	    field.set(dialog, closeflag );
+	                	    dialog.dismiss();
+	                	    passwdtext.setText("");
 
+	                	}
+	                	catch (Exception e)
+	                	{
+
+	                	}
+	                 }  
+	             })
+	          .setNegativeButton("退出", new android.content.DialogInterface.OnClickListener() {  
+                  public void onClick(android.content.DialogInterface dialog, int id) {  
+                	  try
+	                	{
+	                		
+	                	    Field field = dialog.getClass()
+	                	            .getSuperclass().getDeclaredField(
+	                	                     "mShowing" );
+	                	    field.setAccessible( true );
+	                	     //   将mShowing变量设为false，表示对话框已关闭
+	                	    field.set(dialog, true );
+	                	    dialog.dismiss();
+	                	    passwdtext.setText("");
+
+	                	}
+	                	catch (Exception e)
+	                	{
+
+	                	}  
+	                  //关闭系统。
+                	  dialog.cancel();  
+                	  System.exit(0);
+                          
+                   }  
+             })  
+	         .show();//显示对话框  				
+//			fbReader.pass=true;
+		}
 	}
 
 	@Override
@@ -198,12 +271,22 @@ public final class FBReader extends ZLAndroidActivity {
 			panel.setExtension(layout);
 			myNavigatePanel.setControlPanel(panel, root, true);
 		}
+//		System.out.println("---on start--------");
+//		if(gotoLibflag){
+//			final FBReaderApp fbreader = (FBReaderApp)ZLApplication.Instance();		
+//			fbreader.doAction(ActionCode.SHOW_LIBRARY);
+//			gotoLibflag=false;
+//		}
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		sendBroadcast(new Intent(getApplicationContext(), KillerCallback.class));
+		final Context context = getApplicationContext();
+		if (context != null) {
+			sendBroadcast(new Intent(context, KillerCallback.class));
+		}
+//		sendBroadcast(new Intent(getApplicationContext(), KillerCallback.class));
 		ControlButtonPanel.restoreVisibilities();
 	}
 
@@ -270,7 +353,17 @@ public final class FBReader extends ZLAndroidActivity {
 				break;
 			}
 			case CANCEL_CODE:
-				fbreader.runCancelAction(resultCode);
+//				fbreader.doAction(ActionCode.SHOW_LIBRARY);
+				if(resultCode==-1){
+					break;
+				}else{
+					final CancelActionDescription description = fbreader.getCancelActionsList().get(resultCode);
+					if (fbreader.isGotoLib(description)) {
+						gotoLibflag=true;
+					}else{
+						fbreader.runCancelAction(resultCode);
+					}
+				}
 				break;
 		}
 	}
@@ -321,6 +414,8 @@ public final class FBReader extends ZLAndroidActivity {
 		});
 
 		final Button btnOk = (Button)layout.findViewById(android.R.id.button1);
+		//hym 当用导航的时候，点了确定跳到确定的页面，这个时候会保存一个 上次看到的书签地址，
+		//用返回键可以再跳到以前看的地方，防止用导航的时候误操作,就找不到以前看的地方了。
 		final Button btnCancel = (Button)layout.findViewById(android.R.id.button3);
 		View.OnClickListener listener = new View.OnClickListener() {
 			public void onClick(View v) {

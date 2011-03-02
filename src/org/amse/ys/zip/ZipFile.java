@@ -6,27 +6,37 @@ import java.util.*;
 public final class ZipFile {
 	public static interface InputStreamHolder {
 		InputStream getInputStream() throws IOException;
+		boolean getZipflag();
 	}
 
 	private static final class FileInputStreamHolder implements InputStreamHolder {
 		private final String myFilePath;
-
+		private boolean zipfileflag=false;
 		FileInputStreamHolder(String filePath) {
 			myFilePath = filePath;
+			String tmp=filePath.toLowerCase();
+			System.out.println("---"+filePath);
+	    	if(tmp.indexOf(".zip")!=-1){
+	    		zipfileflag=true;
+	    	}
 		}
-
+		public boolean getZipflag(){
+			return zipfileflag;
+		}
 		public InputStream getInputStream() throws IOException {
 			return new FileInputStream(myFilePath);
 		}
+		
 	}
 
     private final InputStreamHolder myStreamHolder;
     private final LinkedHashMap<String,LocalFileHeader> myFileHeaders = new LinkedHashMap<String,LocalFileHeader>();
 
     private boolean myAllFilesAreRead;
-
-    public ZipFile(String filePath) {
+    
+    public ZipFile(String filePath) {   	
 		this(new FileInputStreamHolder(filePath));
+		
     }
 
     public ZipFile(InputStreamHolder streamHolder) {
@@ -43,7 +53,8 @@ public final class ZipFile {
 
     private boolean readFileHeader(MyBufferedInputStream baseStream, String fileToFind) throws IOException {
 		LocalFileHeader header = new LocalFileHeader();
-		header.readFrom(baseStream);
+		
+		header.readFrom(baseStream,myStreamHolder.getZipflag());
 
 		if (header.Signature != LocalFileHeader.FILE_HEADER_SIGNATURE) {
 			return false;
@@ -67,7 +78,8 @@ public final class ZipFile {
             return;
         }
         myAllFilesAreRead = true;
-
+        
+//        if()
 		MyBufferedInputStream baseStream = getBaseStream();
         baseStream.setPosition(0);
         myFileHeaders.clear();

@@ -467,7 +467,7 @@ public final class Library {
 		}
 		return true;
 	}
-
+	//删除图书
 	public void removeBook(Book book, int removeMode) {
 		if (removeMode == REMOVE_DONT_REMOVE) {
 			return;
@@ -484,7 +484,7 @@ public final class Library {
 		}
 		mySearchResult.removeBook(book);
 		myFavorites.removeBook(book);
-
+		myLibraryByTitle.removeBook(book);
 		BooksDatabase.Instance().deleteFromBookList(book.getId());
 		if ((removeMode & REMOVE_FROM_DISK) != 0) {
 			book.File.getPhysicalFile().delete();

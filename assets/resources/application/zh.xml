@@ -42,6 +42,7 @@
 		</node>
 		<node name="openBook" value="打开图书" />
 		<node name="showBookInfo" value="书文信息"/>
+		<node name="deleteBookInfo" value="删除记录" />
 		<node name="deleteBook" value="删除图书" />
 		<node name="addToFavorites" value="收藏"/>
 		<node name="removeFromFavorites" value="从收藏中移除"/>
@@ -160,6 +161,7 @@
 		</node>
 	</node>
 	<node name="cancelMenu">
+		<node name="gotoLib" value="本地藏书" toBeTranslated="true"/>
 		<node name="previousBook" value="打开上一本书" toBeTranslated="true"/>
 		<node name="returnTo" value="返回到 ..." toBeTranslated="true"/>
 		<node name="close" value="关闭 FlyBook" toBeTranslated="true"/>
@@ -452,6 +454,14 @@
 				</node>
 				<node name="font" value="字体"/>
 			</node>
+			<node name="passwd" value="密码">
+				<node name="summary" value="访问是否需要密码"/>
+				<node name="allowPasswdAdjustment" value="密码设置">
+					<node name="summaryOn" value="使用密码"/>
+					<node name="summaryOff" value="不使用密码"/>
+				</node>
+				<node name="setpwd" value="设置密码" />
+			</node>
 			<node name="display" value="显示">
 				<node name="summary" value="亮度控制，防止进入睡眠状态"/>
 				<node name="allowScreenBrightnessAdjustment" value="屏幕亮度调整">
@@ -526,7 +536,10 @@
 			</node>
 		</node>
 		<node name="deleteBookBox">
-			<node name="message" value="确认删除该文件?" />
+			<node name="message" value="确认删除该文件?将删除真实文件！" />
+		</node>
+		<node name="deleteBookBoxInfo">
+			<node name="message" value="确认删除该记录?" />
 		</node>
 		<node name="redownloadFileBox">
 			<node name="message" value="该文件已存在，确认重新下载?" />

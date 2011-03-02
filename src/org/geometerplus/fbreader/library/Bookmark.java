@@ -37,6 +37,7 @@ public final class Bookmark extends ZLTextFixedPosition {
 	public static List<Bookmark> invisibleBookmarks(Book book) {
 		final List<Bookmark> list = BooksDatabase.Instance().loadBookmarks(book.getId(), false);
 		Collections.sort(list, new ByTimeComparator());
+//		System.out.println("---bookmark size-"+list.size());
 		return list;
 	}
 
@@ -85,7 +86,7 @@ public final class Bookmark extends ZLTextFixedPosition {
 		myBookTitle = book.getTitle();
 		myText = createBookmarkText(cursor, maxLength);		
 		myCreationDate = new Date();
-		if(myText==null||myText.trim().length()==0){
+		if(myText==null||myText.trim().length()==0){//hym 书签
 			myText=myBookTitle+"-"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(myCreationDate);
 		}
 		ModelId = modelId;

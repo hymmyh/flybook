@@ -36,6 +36,10 @@ public final class ZLCharBuffer {
 	public ZLCharBuffer() {
 		this(20);
 	}
+	public ZLCharBuffer(String value) {
+		myLength = value.length();
+		myData = value.toCharArray();
+	}
 
 	ZLCharBuffer(ZLCharBuffer container) {
 		final int len = container.myLength;

@@ -32,7 +32,7 @@ public class LocalFileHeader {
     LocalFileHeader() {
     }
 
-    void readFrom(MyBufferedInputStream stream) throws IOException {
+    void readFrom(MyBufferedInputStream stream,boolean flag) throws IOException {
 		Signature = stream.read4Bytes();
 		switch (Signature) {
 			default:
@@ -44,7 +44,7 @@ public class LocalFileHeader {
 				stream.skip(comment);
 				break;
 			}
-			case FOLDER_HEADER_SIGNATURE:
+			case FOLDER_HEADER_SIGNATURE://zip 文件
 			{
                 Version = stream.read4Bytes();
                 Flags = stream.read2Bytes();
@@ -61,12 +61,18 @@ public class LocalFileHeader {
                 ExtraLength = stream.read2Bytes();
                 int comment = stream.read2Bytes();
 				stream.skip(12);
-				FileName = stream.readString(NameLength);
+//				FileName = stream.readString(NameLength);
+				//hym 加，为了处理 文件名是中文的问题,导致 epub 慢的很
+				if(flag){
+					FileName = stream.readString(NameLength,true);
+				}else{
+					FileName = stream.readString(NameLength);
+				}
 				stream.skip(ExtraLength);
 				stream.skip(comment);
 				break;
 			}
-			case FILE_HEADER_SIGNATURE:
+			case FILE_HEADER_SIGNATURE://epub 文件
                 Version = stream.read2Bytes();
                 Flags = stream.read2Bytes();
                 CompressionMethod = stream.read2Bytes();
@@ -80,7 +86,13 @@ public class LocalFileHeader {
 				}
                 NameLength = stream.read2Bytes();
                 ExtraLength = stream.read2Bytes();
-				FileName = stream.readString(NameLength);
+                if(flag){
+					FileName = stream.readString(NameLength,true);
+				}else{
+					FileName = stream.readString(NameLength);
+				}
+//				FileName = stream.readString(NameLength);
+//                FileName = stream.readString(NameLength,true);
 				stream.skip(ExtraLength);
 				break;
 			case DATA_DESCRIPTOR_SIGNATURE:

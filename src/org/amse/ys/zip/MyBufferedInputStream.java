@@ -2,6 +2,8 @@ package org.amse.ys.zip;
 
 import java.io.*;
 
+import org.geometerplus.fbreader.formats.txt.SinoDetect;
+
 final class MyBufferedInputStream extends InputStream {
     private final ZipFile.InputStreamHolder myStreamHolder;
     private InputStream myFileInputStream;
@@ -61,7 +63,19 @@ final class MyBufferedInputStream extends InputStream {
         myBytesReady--;        
         return myBuffer[myPositionInBuffer++] & 255;        
     }
-
+    //hym 加，为了处理 文件名是中文的问题
+    public byte read(boolean flag) throws IOException {        
+        myCurrentPosition++;
+        if (myBytesReady <= 0) {
+            myPositionInBuffer = 0;
+            myBytesReady = myFileInputStream.read(myBuffer);
+            if (myBytesReady <= 0) {
+                return -1;
+            }
+        }        
+        myBytesReady--;        
+        return myBuffer[myPositionInBuffer++] ;        
+    }
     int read2Bytes() throws IOException {
         int low = read();
         int high = read();
@@ -89,7 +103,17 @@ final class MyBufferedInputStream extends InputStream {
         }
         return new String(array);
     }
-
+    String readString(int stringLength,boolean flag) throws IOException {
+        byte[] array = new byte[stringLength];
+        for (int i = 0; i < stringLength; i++) {
+            array[i] = (byte)read(flag);
+        }
+      //hym 加，为了处理 文件名是中文的问题
+        int enc = new SinoDetect().detectEncoding(array);
+        System.out.println("-------hhh:"+enc);
+        
+        return new String(array,SinoDetect.nicename[enc]);
+    }
     public void skip(int n) throws IOException {
         myCurrentPosition += n;
         if (myBytesReady >= n) {

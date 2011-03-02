@@ -108,7 +108,7 @@ public class HtmlToString {
 	private static class HtmlToStringReader implements ZLHtmlReader {
 
 		private StringBuilder myBuffer = new StringBuilder();
-		private byte[] myByteData;
+		private char[] myByteData;
 		private int myByteDataLength;
 		private HashMap<String,char[]> myEntityMap;
 
@@ -177,8 +177,8 @@ public class HtmlToString {
 			}
 			final String data;
 			try {
-				data = new String(myByteData, 0, myByteDataLength, "UTF-8");
-			} catch (UnsupportedEncodingException ex) {
+				data = new String(myByteData, 0, myByteDataLength);
+			} catch (Exception ex) {
 				throw new RuntimeException("It's impossible!!! UTF-8 charset is not supported!!!", ex);
 			}
 			myByteDataLength = 0;
@@ -245,13 +245,13 @@ public class HtmlToString {
 				return;
 			}
 			if (myByteData == null) {
-				myByteData = new byte[length];
+				myByteData = new char[length];
 				System.arraycopy(data, start, myByteData, 0, length);
 				myByteDataLength = length;
 			} else {
 				if (myByteData.length < myByteDataLength + length) {
-					final byte[] oldData = myByteData;
-					myByteData = new byte[myByteDataLength + length];
+					final char[] oldData = myByteData;
+					myByteData = new char[myByteDataLength + length];
 					System.arraycopy(oldData, 0, myByteData, 0, myByteDataLength);
 				}
 				System.arraycopy(data, start, myByteData, myByteDataLength, length);

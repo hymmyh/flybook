@@ -41,6 +41,9 @@ public final class FBView extends ZLTextView {
 	FBView(FBReaderApp reader) {
 		myReader = reader;
 	}
+//	public void setPaintContext(ZLPaintContext context1){
+//		this.myContext=context1;
+//	}
 	//ZLTextWritablePlainModel  ---ZLTextModel
 	public void setModel(ZLTextModel model) {
 		myIsManualScrollingActive = false;

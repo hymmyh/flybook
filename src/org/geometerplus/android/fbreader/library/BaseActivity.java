@@ -47,6 +47,7 @@ abstract class BaseActivity extends ListActivity {
 	private static final int ADD_TO_FAVORITES_ITEM_ID = 2;
 	private static final int REMOVE_FROM_FAVORITES_ITEM_ID = 3;
 	private static final int DELETE_BOOK_ITEM_ID = 4;
+	private static final int DELETE_BOOKINFO_ITEM_ID = 5;
 
 	protected static final int CHILD_LIST_REQUEST = 0;
 	protected static final int BOOK_INFO_REQUEST = 1;
@@ -76,7 +77,7 @@ abstract class BaseActivity extends ListActivity {
 				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 		);
 	}
-
+	//图书操作菜单，打开图书，书文信息，收藏，删除图书
 	protected void createBookContextMenu(ContextMenu menu, Book book) {
 		menu.setHeaderTitle(book.getTitle());
 		menu.add(0, OPEN_BOOK_ITEM_ID, 0, myResource.getResource("openBook").getValue());
@@ -86,6 +87,11 @@ abstract class BaseActivity extends ListActivity {
 		} else {
 			menu.add(0, ADD_TO_FAVORITES_ITEM_ID, 0, myResource.getResource("addToFavorites").getValue());
 		}
+		//删除记录 hym
+		
+		menu.add(0, DELETE_BOOKINFO_ITEM_ID, 0, myResource.getResource("deleteBookInfo").getValue());
+        
+		//删除图书
 		if ((LibraryInstance.getRemoveBookMode(book) & Library.REMOVE_FROM_DISK) != 0) {
 			menu.add(0, DELETE_BOOK_ITEM_ID, 0, myResource.getResource("deleteBook").getValue());
         }
@@ -171,7 +177,18 @@ abstract class BaseActivity extends ListActivity {
 			.setNegativeButton(buttonResource.getResource("no").getValue(), null)
 			.create().show();
 	}
-
+	private void tryToDeleteBookInfo(Book book) {
+		final ZLResource dialogResource = ZLResource.resource("dialog");
+		final ZLResource buttonResource = dialogResource.getResource("button");
+		final ZLResource boxResource = dialogResource.getResource("deleteBookBoxInfo");
+		new AlertDialog.Builder(this)
+			.setTitle(book.getTitle())
+			.setMessage(boxResource.getResource("message").getValue())
+			.setIcon(0)
+			.setPositiveButton(buttonResource.getResource("yes").getValue(), new BookDeleter(book, Library.REMOVE_FROM_LIBRARY))
+			.setNegativeButton(buttonResource.getResource("no").getValue(), null)
+			.create().show();
+	}
 	protected void deleteBook(Book book, int mode) {
 		LibraryInstance.removeBook(book, mode);
 	}
@@ -198,6 +215,9 @@ abstract class BaseActivity extends ListActivity {
 			case REMOVE_FROM_FAVORITES_ITEM_ID:
 				LibraryInstance.removeBookFromFavorites(book);
 				getListView().invalidateViews();
+				return true;
+			case DELETE_BOOKINFO_ITEM_ID:
+				tryToDeleteBookInfo(book);
 				return true;
 			case DELETE_BOOK_ITEM_ID:
 				tryToDeleteBook(book);

@@ -36,10 +36,19 @@ abstract class ZLTextViewBase extends ZLView {
 	}
 
 	final int getWordHeight() {
-		if (myWordHeight == -1) {
+		
+//		if (myWordHeight == -1) {
+		//hym 02-07  修改为了防止myWordHeight 过小的情况,是因为有些时候 myContext.getStringHeight() 这个获得的值是1
+		if (myWordHeight <= 1) {
 			final ZLTextStyle textStyle = myTextStyle;
 			myWordHeight = (int)(myContext.getStringHeight() * textStyle.getLineSpacePercent() / 100) + textStyle.getVerticalShift();
+//			System.out.println("4---hym getWordHeight:"+myContext.getStringHeight()+"-"+textStyle.getLineSpacePercent()+"-"+textStyle.getVerticalShift());
 		}
+//		System.out.println("2---hym getWordHeight:"+myContext.getStringHeight()+"-"+myWordHeight);
+		//hym 字体出现1的高度是这个地方出错了，不知道原因，出现myContext.getStringHeight()==26 myWordHeight=1的情况
+//		if(myWordHeight<5){
+//			myWordHeight=20;
+//		}
 		return myWordHeight;
 	}
 
@@ -123,6 +132,7 @@ abstract class ZLTextViewBase extends ZLView {
 
 	final int getElementHeight(ZLTextElement element) {
 		if (element instanceof ZLTextWord) {
+//			System.out.println("---hym create page txt h"+getWordHeight());
 			return getWordHeight();
 		} else if (element instanceof ZLTextImageElement) {
 //			System.out.println("---hym create page image h");

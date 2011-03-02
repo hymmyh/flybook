@@ -1,12 +1,29 @@
----hym 加载效率问题---2011-01-31  ????
+---hym 加载效率问题-或是密码--  ????---------
 epub？
+---2011-02-08--
+初步解决 zlandroidpaintcontex 没有来的急初始化的时候，zltextveiw 调用 dummypaintcontext
+获得文字 长和宽 的时候都小于实际值，结果文字重叠在一起了。
+改 dummypaintcontext getStringWidth 返回26
+---2011-02-06--
+修改一些bug。zip文件中文。删除记录中删除标题中的记录。
+---2011-02-05--
+添加 打开软件密码功能。
+把flybook 书库放到下面的位置来。方便手指点击，单手操作（dz ，最上面很难点到）。
+zip 中文文件名 乱码？？？ ---ok，测试过中文简体。其他编码没有测试过。
 
+---hym ---2011-02-03 --
+添加删除记录。不在物理删除文件。
+发现一个bug，纯图片文档中的 导航有问题。基本解决。
+===== 0.99.11 (Feb 01, 2011) =====
+* Galician translation has been added (by Miguel Anxo Bouzada)
+* Czech translation has been updated (by Marek Pavelka)
+* Mobipocket images/cover/links support has been added (by Steffen Siebert)
+* Small fixes
+返回菜单中，添加一个 本地藏书
 ---hym ---2011-01-31 --
 更新到 0.99.10
 修正书签中的一个bug
 去除以前自己写的退出。
-===== 0.99.11 (??? ??, 2011) =====
-* Galician translation has been added (by Miguel Anxo Bouzada)
 
 ===== 0.99.10 (Jan 30, 2011) =====
 * Full-size image view

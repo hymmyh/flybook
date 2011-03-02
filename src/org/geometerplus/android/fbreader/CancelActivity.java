@@ -25,6 +25,10 @@ import android.os.Bundle;
 import android.widget.*;
 import android.view.*;
 
+import org.geometerplus.fbreader.fbreader.ActionCode;
+import org.geometerplus.fbreader.fbreader.FBReaderApp;
+import org.geometerplus.fbreader.fbreader.FBReaderApp.CancelActionDescription;
+import org.geometerplus.zlibrary.core.application.ZLApplication;
 import org.geometerplus.zlibrary.ui.android.R;
 
 public class CancelActivity extends ListActivity {
@@ -90,6 +94,11 @@ public class CancelActivity extends ListActivity {
 		}
 
 		public final void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			final FBReaderApp fbreader = (FBReaderApp)ZLApplication.Instance();		
+			final CancelActionDescription description = fbreader.getCancelActionsList().get((int)id);
+			if (fbreader.isGotoLib(description)) {
+				fbreader.doAction(ActionCode.SHOW_LIBRARY);				
+			}
 			setResult((int)id);
 			finish();
 		}
