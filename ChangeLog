@@ -1,5 +1,17 @@
----hym 加载效率问题-或是密码--  ????---------
-epub？
+---2011-02-14--
+===== 0.99.13 (Feb 13, 2011) =====
+* Fixed book/position forgetting bug
+* Color channel values in color dialog
+* Fixed categories displaying in feedbooks feed
+---2011-02-10--
+pdb TEXtREAd 文档处理，并且解决lz77解码问题。
+---2011-02-09--
+===== 0.99.12 (Feb ??, 2011) =====
+* Added support for more dictionaries (by Steffen Siebert)
+* Option 'show status bar when menu becomes visible' (by Steffen Siebert)
+* Litres: series list has been added
+* Litres: recommendation list has been added
+
 ---2011-02-08--
 初步解决 zlandroidpaintcontex 没有来的急初始化的时候，zltextveiw 调用 dummypaintcontext
 获得文字 长和宽 的时候都小于实际值，结果文字重叠在一起了。

@@ -19,12 +19,10 @@
 
 package org.geometerplus.android.fbreader.preferences;
 
-import android.content.Context;
 import android.content.Intent;
 
 import org.geometerplus.zlibrary.core.options.ZLIntegerOption;
 import org.geometerplus.zlibrary.core.options.ZLIntegerRangeOption;
-import org.geometerplus.zlibrary.core.resources.ZLResource;
 
 import org.geometerplus.zlibrary.text.view.style.*;
 
@@ -32,26 +30,12 @@ import org.geometerplus.zlibrary.ui.android.library.ZLAndroidApplication;
 import org.geometerplus.zlibrary.ui.android.view.AndroidFontUtil;
 
 import org.geometerplus.fbreader.fbreader.*;
-import org.geometerplus.fbreader.library.Book;
 import org.geometerplus.fbreader.Paths;
 import org.geometerplus.fbreader.bookmodel.FBTextKind;
 
 public class PreferenceActivity extends ZLPreferenceActivity {
 	public PreferenceActivity() {
 		super("Preferences");
-	}
-	class PasswdPreference extends ZLStringPreference {
-		private final FBReaderApp myfbReader;
-
-		PasswdPreference(Context context, ZLResource rootResource, String resourceKey, FBReaderApp fbReader) {
-			super(context, rootResource, resourceKey);
-			myfbReader = fbReader;
-			setValue(fbReader.PasswdOption.getValue());
-		}
-
-		public void onAccept() {
-			myfbReader.PasswdOption.setValue(getValue());
-		}
 	}
 
 	@Override
@@ -67,9 +51,27 @@ public class PreferenceActivity extends ZLPreferenceActivity {
 		}
 		directoriesScreen.addOption(Paths.WallpapersDirectoryOption(), "wallpapers");
 
+		final ZLPreferenceSet statusBarPreferences = new ZLPreferenceSet();
 		final Screen appearanceScreen = createPreferenceScreen("appearance");
 		appearanceScreen.addOption(androidApp.AutoOrientationOption, "autoOrientation");
-		appearanceScreen.addOption(androidApp.ShowStatusBarOption, "showStatusBar");
+		appearanceScreen.addPreference(
+			new ZLBooleanPreference(
+				this, androidApp.ShowStatusBarOption, appearanceScreen.Resource, "showStatusBar"
+			) {
+				@Override
+				public void onClick() {
+					super.onClick();
+					statusBarPreferences.setEnabled(!isChecked());
+				}
+			}
+		);
+		statusBarPreferences.add(
+			appearanceScreen.addOption(
+				androidApp.ShowStatusBarWhenMenuIsActiveOption,
+				"showStatusBarWhenMenuIsActive"
+			)
+		);
+		statusBarPreferences.setEnabled(!androidApp.ShowStatusBarOption.getValue());
 
 		final Screen textScreen = createPreferenceScreen("text");
 		final ZLTextStyleCollection collection = ZLTextStyleCollection.Instance();
@@ -299,29 +301,7 @@ public class PreferenceActivity extends ZLPreferenceActivity {
 		footerPreferences.setEnabled(
 			fbReader.ScrollbarTypeOption.getValue() == FBView.SCROLLBAR_SHOW_AS_FOOTER
 		);
-		final Screen passwdScreen = createPreferenceScreen("passwd");
-		passwdScreen.addPreference(new ZLBooleanPreference(
-			this,
-			fbReader.AllowPasswdAdjustmentOption,
-			passwdScreen.Resource,
-			"allowPasswdAdjustment"
-		) {
-			public void onAccept() {
-				super.onAccept();
-				if (!isChecked()) {
-					
-					
-//					---
-//					androidApp.ScreenBrightnessLevelOption.setValue(0);
-				}
-			}
-		});
-		passwdScreen.addPreference(new PasswdPreference(
-				this,
-				passwdScreen.Resource,
-				"setpwd",
-				fbReader
-			) );
+
 		final Screen displayScreen = createPreferenceScreen("display");
 		displayScreen.addPreference(new ZLBooleanPreference(
 			this,

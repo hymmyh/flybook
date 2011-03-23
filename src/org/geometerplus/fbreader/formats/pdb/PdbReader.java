@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,10 +24,13 @@ import org.geometerplus.zlibrary.text.model.ZLTextParagraph;
 /**
  * @author hym E-mail:hymmyh@gmail.com
  * @version 创建时间：2011-2-08 下午01:16:16
- * 类说明 pdb textread 读取
+ * 类说明 pdb text read 读取,注意压缩方式
  */
 public class PdbReader extends BookReader implements ZLXMLReader {
 	private static final int WINDOW_LENGTH = 4096;  
+	private static boolean compressionflag = false;//要从第一条记录中的数据来判断是否用了压缩。
+	private static long txtlen=0;
+	private static byte[] ttb=new byte[0];
 	public PdbReader(BookModel model) {
 		super(model);
 		// TODO Auto-generated constructor stub
@@ -61,131 +65,133 @@ public class PdbReader extends BookReader implements ZLXMLReader {
 		}
 		return bytes;
 	}
-	private static int lzssDecompress(byte[] from, int compLen, byte[] to, int origLen) {  
-        return lzssDecompress(from, compLen, to, 0, origLen);  
-    }  
-	 protected int lz77Decompress(byte[] to, byte[] from, int paramInt)
-	  {
-	    int i = 0;
-	    int j = 0;
-	    int k;
-	    int l;
-	    while (true)
-	    {
-	      if ((i >= paramInt) )
-	        return j;
-	      k = i + 1;
-	      l = from[i] & 0xFF;
-	      if ((l >= 1) && (l <= 8))
-	      {
-	        i = k;
-	        for (int i1 = l; ; i1 = l)
-	        {
-	          l = i1 + -1;
-	          if (i1 > 0);
-	          int i2 = j + 1;
-	          int i3 = i + 1;
-	          byte i4 = from[i];
-	          to[j] = i4;
-	          i = i3;
-	          j = i2;
-	        }
-	      }
-	      if (l <= 127)
-	      {
-	        int i5 = j + 1;
-	        int i6 = k - 1;
-	        byte i7 = from[i6];
-	        to[j] = i7;
-	        i = k;
-	        j = i5;
-	      }
-	      if (l < 192)
-	        break;
-	      int i8 = j + 1;
-	      to[j] = 32;
-	      j = i8 + 1;
-	      int i9 = k - 1;
-	      byte i10 = (byte)(from[i9] ^ 0x80);
-	      to[i8] = i10;
-	      i = k;
-	    }
-	    int i11 = l << 8;
-	    i = k + 1;
-	    int i12 = from[k] & 0xFF;
-	    int i13 = (i11 | i12) & 0x3FFF;
-	    int i14 = i13 >>> 3;
-	    int i15 = (i13 & 0x7) + 3;
-	    int i16 = j;
-	    while (true)
-	    {
-	      if (i15 <= 0)
-	        j = i16;
-	      int i17 = i16 - i14;
-	      byte i18 = to[i17];
-	      to[i16] = i18;
-	      i16 += 1;
-	      i15 += -1;
-	    }
-	  } 
-    private static int lzssDecompress(byte[] from, int compLen, byte[] to, int pos, int origLen) {  
-        if (to == null) to = new byte[origLen];  
-          
-        byte[] window = new byte[WINDOW_LENGTH];  
-        int readOffset = 0;  
-        int writeOffset = pos;  
-        int marker = 0; // read marker, 8-bits, 1 for raw byte, 0 for back ref  
-        int windowWriteOffset = 0x0FEE;  
-        int windowReadOffset = 0;  
-        int backRefLength = 0;  
-        int current = 0;  
-                  
-        while (readOffset != from.length) {  
-            marker >>= 1;  
-              
-            if ((marker & 0x0100) == 0) {  
-                current = from[readOffset++] & 0x0FF;  
-                marker = 0x0FF00 | current;  
-            }  
-              
-            if(readOffset == from.length) break;  
-            if ((marker & 0x01) == 1) { // copy raw bytes  
-                current = from[readOffset++] & 0x0FF;  
-                to[writeOffset++] = (byte)current;  
-                window[windowWriteOffset++] = (byte)current;  
-                windowWriteOffset &= 0x0FFF;  
-            } else { // copy from slide window  
-                windowReadOffset = from[readOffset++] & 0x0FF;  
-                if(readOffset == from.length) break;  
-                current = from[readOffset++] & 0x0FF;  
-                windowReadOffset |= (current & 0x0F0) << 4;  
-                backRefLength = (current & 0x0F) + 2;  
-                if (backRefLength < 0) continue;  
-                  
-                int addOffset = 0;  
-//                System.out.println("-------hym----lzss"+readOffset+"|"+writeOffset);
-                while (addOffset <= backRefLength) {  
-                    int curOfs = (windowReadOffset + addOffset++) & 0x0FFF;  
-                    current = window[curOfs] & 0x0FF;  
-                    windowReadOffset &= 0x0FFF;  
-                    to[writeOffset++] = (byte)current;  
-                    window[windowWriteOffset++] = (byte)current;  
-                    windowWriteOffset &= 0x0FFF;  
-                } // while  
-            } // if-else      
-        } // while  
-          
-        return writeOffset;  
-    }  
+	public void getcompressionflag(int offset,ZLFile file){
+		byte[] bytes = null;
+		InputStream is = null;
+//		FileInputStream fis = file.getInputStream();
+//	    ZipInputStream zin = new ZipInputStream(is);
+		try{
+			is = file.getInputStream();
+//			ZipInputStream zin = new ZipInputStream(is);
+//			if(zin.getNextEntry()==null){
+//				System.out.println("--zip dec err--");
+//			}
+			long skipLength= offset;
+			is.skip(skipLength);
+//			int length = (int) contentArr.get(index).getLength();
+			bytes = new byte[2];
+			is.read(bytes);
+//			System.out.println("--bytes[1]---"+bytes[1]);
+			if(bytes[1]==2){
+				compressionflag=true;
+			}else{
+				compressionflag=false;
+			}
+			is.skip(2);//跳过2个
+			byte[] tmp = new byte[4];//长度 没有压缩的文本
+			is.read(tmp);
+			txtlen=(((long)(tmp[0] & 0xFF)) << 24) +
+			  + ((tmp[1] & 0xFF) << 16) +
+			  + ((tmp[2] & 0xFF) << 8) +
+			  + (tmp[3] & 0xFF);
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			if(is != null){
+				try {
+					is.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+	}
+	public String bytesToString(byte[] startb,byte[] endb,int len,String encodingName,boolean flag){
+		int allnum=0;
+		if(startb!=null){
+			allnum=startb.length;
+		}
+		int num=len-1;
+		for(int k=len-1;k>=0&&flag;k--){
+			if(endb[k]=='\n'){
+				num=k;
+				break;
+			}
+		}
+		allnum+=num+1;
+		byte[] tmpb = new byte[allnum];
+		if(startb!=null){
+			System.arraycopy(startb, 0, tmpb, 0, startb.length);
+			System.arraycopy(endb, 0, tmpb,  startb.length,num+1);
+		}else{
+			System.arraycopy(endb, 0, tmpb, 0, num+1);
+		}
+		ttb=new byte[len-num-1];
+		System.arraycopy(endb, num+1, ttb, 0,len-num-1);
+//		System.out.println("-----hym --startb"+ttb.length+"|");
+		String str="";
+		try {
+			str=new String(tmpb,encodingName);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return str;
+	}
+	/**
+	 * 解码 PalmDoc
+	 * PalmDoc files are decoded as follows:
+
+    Read a byte from the compressed stream. If the byte is
+        0x00: "1 literal" copy that byte unmodified to the decompressed stream.
+        0x09 to 0x7f: "1 literal" copy that byte unmodified to the decompressed stream.
+        0x01 to 0x08: "literals": the byte is interpreted as a count from 1 to 8, and that many literals are copied unmodified from the compressed stream to the decompressed stream.
+        0x80 to 0xbf: "length, distance" pair: the 2 leftmost bits of this byte ('10') are discarded, and the following 6 bits are combined with the 8 bits of the next byte to make a 14 bit "distance, length" item. Those 14 bits are broken into 11 bits of distance backwards from the current location in the uncompressed text, and 3 bits of length to copy from that point (copying n+3 bytes, 3 to 10 bytes).
+        0xc0 to 0xff: "byte pair": this byte is decoded into 2 characters: a space character, and a letter formed from this byte XORed with 0x80.
+    Repeat from the beginning until there is no more bytes in the compressed file.
+
+	 * @param to
+	 * @param from
+	 * @param paramInt
+	 * @return
+	 */
+
+    
+    /**
+     *  从 维基百科 外文版找到资料。
+bytes	content	comments
+2	Compression	1 == no compression, 2 = PalmDOC compression (see below)
+2	Unused	Always zero
+4	text length	Uncompressed length of the entire text of the book
+2	record count	Number of PDB records used for the text of the book.
+2	record size	Maximum size of each record containing text, always 4096
+4	Current Position	Current reading position, as an offset into the uncompressed text
+
+ PalmDOC uses LZ77 compression techniques. DOC files can contain only compressed text. 
+ The format does not allow for any text formatting. This keeps files small, in keeping 
+ with the Palm philosophy. However, extensions to the format can use tags, such as 
+ HTML or PML, to include formatting within text. These extensions to PalmDoc are not 
+ interchangeable and are the basis for most eBook Reader formats on Palm devices. 
+ 
+     * @param file
+     * @return
+     */
 	boolean readBook(ZLFile file) {
 		InputStream stream = null;
 		startDocumentHandler();
+//		boolean compressionflag = false;//要从第一条记录中的数据来判断是否用了压缩。
+		
 		try {
 			stream = file.getInputStream();
 			final PdbHeader header = new PdbHeader(stream);
 			String tmpstr="";
             boolean flag1 = false;
             int pageNum = header.Offsets.length;
+            getcompressionflag(header.Offsets[0],file);
+//            System.out.println("-----hym---"+compressionflag+"|"+txtlen);
+           
 			for(int j=1;j<pageNum;j++){ 
 //				beginContentsParagraph(j);
 				
@@ -199,18 +205,28 @@ public class PdbReader extends BookReader implements ZLXMLReader {
 				beginParagraph(ZLTextParagraph.Kind.TEXT_PARAGRAPH);
 //				String txttmp=new String(getContentBytes(header.Offsets[j],file.getPath(),length),header.encodingName);
 				byte[] btmp = getContentBytes(header.Offsets[j],file,length);
-//				byte[] to= new byte[btmp.length+1024];
-//				int tolen=this.lz77Decompress(to, btmp, btmp.length);
-//				LZ77T lz77t = new LZ77T();
-//			    lz77t.lz77decompress(btmp, (btmp.length - 1) * 8);
-//				byte[] to =lz77t.getPOutputBuffer();
-//				int tolen=lz77t.getPulNumberOfBytes();
-//				int tolen=lzssDecompress(btmp,0,to,btmp.length+1024);
-//				int enc = new SinoDetect().detectEncoding(btmp);
-//				String encodingName=SinoDetect.nicename[enc];
-//				String txttmp=new String(to,0,tolen,header.encodingName);
-				String txttmp=new String(btmp,header.encodingName);
-//				System.out.println("-----hym --read pdb"+length+"|"+tolen);
+				String txttmp="";
+				if(compressionflag){
+					byte[] to= new byte[btmp.length+1024];
+					int tolen=DocDecompressor.decompress(btmp, to);
+//					System.out.println("-----hym --read pdb"+length+"|"+tolen);
+					//不能直接 string 可能会截断在 中文的中间。
+//					txttmp=new String(to,0,tolen,header.encodingName);
+					if(j==pageNum-1){
+						txttmp=bytesToString(ttb,to,tolen,header.encodingName,false);
+					}else
+						txttmp=bytesToString(ttb,to,tolen,header.encodingName,true);
+//					System.out.println("-----hym --ttb"+ttb.length+"|");
+				}else{
+					//不能直接 string 可能会截断在 中文的中间。
+//					txttmp=new String(btmp,header.encodingName);
+					if(j==pageNum-1){
+						txttmp=bytesToString(ttb,btmp,btmp.length,header.encodingName,false);
+					}else
+						txttmp=bytesToString(ttb,btmp,btmp.length,header.encodingName,true);
+				}
+//				String txttmp=new String(btmp,header.encodingName);
+				
                     if(Model.Book.getZnFlag()){
     	                //智能处理文本，速度慢。
     	                String str= txttmp;
