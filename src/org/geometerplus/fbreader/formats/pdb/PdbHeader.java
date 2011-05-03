@@ -23,7 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.geometerplus.fbreader.formats.txt.SinoDetect;
+import org.geometerplus.fbreader.formats.txt.JustEncoding;
 
 public class PdbHeader {
 	public final String DocName;
@@ -37,8 +37,8 @@ public class PdbHeader {
 		if (stream.read(buffer, 0, 32) != 32) {
 			throw new IOException("PdbHeader: cannot reader document name");
 		}
-		int enc = new SinoDetect().detectEncoding(buffer);
-		encodingName=SinoDetect.nicename[enc];
+		int enc = new JustEncoding().detectEncoding(buffer);
+		encodingName=JustEncoding.nicename[enc];
 		DocName = new String(buffer,encodingName).trim();
 		Flags = PdbUtil.readShort(stream);
 

@@ -636,7 +636,7 @@ public final class FBView extends ZLTextView {
 			}
 		}
 
-		// TODO: remove
+		
 		int myGaugeWidth = 1;
 		public int getGaugeWidth() {
 			return myGaugeWidth;

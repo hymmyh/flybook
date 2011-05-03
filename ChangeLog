@@ -1,3 +1,46 @@
+---2011-03-12------ 更新的基础版本 0.99.15
+chm 中的txt支持
+===== 0.99.14/15 (Mar 11, 2011) =====
+* New application icon
+* Thai localization (by Samphan Pojanasophanakul)
+* Fixed TTF font style detection
+* opds:// URLs support has been implemented
+* Unexpected search call has been fixed
+* Ignore case comparison for zip entry names
+* Fixed custom OPDS link search
+* Periodical update of custom links information has been added
+* Epub rendering issues (like unexpected paragraph ends) were fixed
+* Multi-body fb2 file processing has been fixed
+* 'Cancel menu' preferences section
+* LitRes: several views for purchased books
+
+---2011-03-06------
+chm电子书阅读做了一些修改。
+---2011-03-04------
+chm电子书阅读bug 改正。
+---2011-02-27------
+接下来chm支持。
+并修改了添加目录的判断if (textModel == bookTextModel) 除去了。
+---2011-02-26------
+接下来chm支持？？？
+处理在线书库出现trying to use a recycled bitmap问题。ok
+---2011-02-23------
+初步解决图文混排，导航的问题。不是很完美。
+发现导航 还是有bug，纯图片没有问题，文字图片混合 有问题，纯文字也有问题。待处理
+---2011-02-21------
+修改SinoDetect.utf16_probability 的bug：
+---2011-02-18------
+修改mobi 文档读取的bug：
+1.由于改动了 htmlreader 中的 byte--》char
+以及  getInputStream 改成了 getInputStreamReader 
+导致mobipockethtmlbookreader 中的 getInputStream 没有修改，出现错误。
+2.zlhtmlparser 为了处理中文 把 byte 都改成了 char，且读取以后 buffer的长度4096 不够，
+加长为 4096*2；而且读取数据后要把 buffer 处理成实际长度（小于等于 4096*2）；不然后面
+解析出错。fb源代码应该不能解析中文的mobi。
+---2011-02-17------
+
+发现mobipockethtmlbookreader 的bug。--解决一个bug；但读出来还是乱码。可能有加密
+
 ---2011-02-14--
 ===== 0.99.13 (Feb 13, 2011) =====
 * Fixed book/position forgetting bug

@@ -42,7 +42,7 @@ class NetworkOPDSFeedReader implements OPDSFeedReader, OPDSConstants, MimeTypes 
 	private int myItemsToLoad = -1;
 
 	/**
-	 * Creates new OPDSFeedReader instance that can be used to get NetworkLibraryItem objects from OPDS feeds.
+	 * Creates new OPDSFeedReader instance that can be used to get NetworkItem objects from OPDS feeds.
 	 *
 	 * @param baseURL    string that contains URL of the OPDS feed, that will be read using this instance of the reader
 	 * @param result     network results buffer. Must be created using OPDSNetworkLink corresponding to the OPDS feed, 
@@ -203,7 +203,7 @@ class NetworkOPDSFeedReader implements OPDSFeedReader, OPDSConstants, MimeTypes 
 			}
 		}
 
-		NetworkLibraryItem item;
+		NetworkItem item;
 		if (hasBookLink) {
 			item = readBookItem(entry);
 		} else {
@@ -218,7 +218,7 @@ class NetworkOPDSFeedReader implements OPDSFeedReader, OPDSConstants, MimeTypes 
 	private static final String AuthorPrefix = "author:";
 	private static final String AuthorsPrefix = "authors:";
 
-	private NetworkLibraryItem readBookItem(OPDSEntry entry) {
+	private NetworkItem readBookItem(OPDSEntry entry) {
 		final OPDSNetworkLink opdsNetworkLink = (OPDSNetworkLink)myData.Link;
 		/*final String date;
 		if (entry.DCIssued != null) {
@@ -368,14 +368,14 @@ class NetworkOPDSFeedReader implements OPDSFeedReader, OPDSConstants, MimeTypes 
 		}
 	}
 
-	private NetworkLibraryItem readCatalogItem(OPDSEntry entry) {
+	private NetworkItem readCatalogItem(OPDSEntry entry) {
 		final OPDSNetworkLink opdsLink = (OPDSNetworkLink)myData.Link;
 		String coverURL = null;
 		String url = null;
 		boolean urlIsAlternate = false;
 		String htmlURL = null;
 		String litresRel = null;
-		NetworkCatalogItem.CatalogType catalogType = NetworkCatalogItem.CatalogType.OTHER;
+		int catalogType = NetworkCatalogItem.FLAGS_DEFAULT;
 		for (ATOMLink link : entry.Links) {
 			final String href = ZLNetworkUtil.url(myBaseURL, link.getHref());
 			final String type = ZLNetworkUtil.filterMimeType(link.getType());
@@ -396,9 +396,9 @@ class NetworkOPDSFeedReader implements OPDSFeedReader, OPDSConstants, MimeTypes 
 					url = href;
 					urlIsAlternate = false;
 					if (REL_CATALOG_AUTHOR.equals(rel)) {
-						catalogType = NetworkCatalogItem.CatalogType.BY_AUTHOR;
+						catalogType &= ~NetworkCatalogItem.FLAG_SHOW_AUTHOR;
 					} else if (REL_CATALOG_SERIES.equals(rel)) {
-						catalogType = NetworkCatalogItem.CatalogType.BY_SERIES;
+						catalogType &= ~NetworkCatalogItem.FLAGS_GROUP;
 					}
 				}
 			} else if (MIME_TEXT_HTML.equals(type)) {
@@ -431,12 +431,12 @@ class NetworkOPDSFeedReader implements OPDSFeedReader, OPDSConstants, MimeTypes 
 			annotation = null;
 		}
 
-		HashMap<Integer, String> urlMap = new HashMap<Integer, String>();
+		HashMap<Integer,String> urlMap = new HashMap<Integer,String>();
 		if (url != null) {
-			urlMap.put(NetworkCatalogItem.URL_CATALOG, url);
+			urlMap.put(NetworkURLCatalogItem.URL_CATALOG, url);
 		}
 		if (htmlURL != null) {
-			urlMap.put(NetworkCatalogItem.URL_HTML_PAGE, htmlURL);
+			urlMap.put(NetworkURLCatalogItem.URL_HTML_PAGE, htmlURL);
 		}
 		if (litresRel != null) {
 			if (REL_BOOKSHELF.equals(litresRel)) {
@@ -457,6 +457,20 @@ class NetworkOPDSFeedReader implements OPDSFeedReader, OPDSConstants, MimeTypes 
 					urlMap,
 					opdsLink.getCondition(entry.Id.Uri)
 				);
+			} else if (REL_BASKET.equals(litresRel)) {
+				return null;
+				/*
+				return new BasketItem(
+					opdsLink,
+					entry.Title,
+					annotation,
+					coverURL,
+					urlMap,
+					opdsLink.getCondition(entry.Id.Uri)
+				);
+				*/
+			} else if (REL_TOPUP.equals(litresRel)) {
+				return new TopUpItem(opdsLink, coverURL);
 			} else {
 				return null;
 			}

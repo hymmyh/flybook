@@ -58,14 +58,16 @@ abstract class PalmDocLikeStream extends PdbStream {
 					return false;
 				}
 				final short recordSize = (short)Math.min(nextOffset - currentOffset, myBuffer.length);
-
+//				System.out.println("-hym---mobi--compress---"+myCompressionType);
 				switch (myCompressionType) {
 					case CompressionType.NONE:
 						myBase.read(myBuffer, 0, recordSize);
 						myBufferLength = recordSize;
 						break;
 					case CompressionType.DOC:
+						
 						myBufferLength = (short)DocDecompressor.decompress(myBase, myBuffer, recordSize);
+//						System.out.println("-hym---mobi--compress---"+recordSize+"|"+myBufferLength);
 						break;
 					//case CompressionType.HUFFDIC:
 					//	myBufferLength = (short)HuffdicDecompressor.decompress(myBase, myBuffer, recordSize);

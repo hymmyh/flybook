@@ -39,9 +39,9 @@ import org.geometerplus.zlibrary.core.image.ZLLoadableImage;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
 import org.geometerplus.zlibrary.core.language.ZLLanguageUtil;
 
-import org.geometerplus.zlibrary.ui.android.R;
-import org.geometerplus.zlibrary.ui.android.image.ZLAndroidImageData;
-import org.geometerplus.zlibrary.ui.android.image.ZLAndroidImageManager;
+import org.geometerplus.zlibrary.ui.androidfly.R;
+import org.geometerplus.zlibrary.ui.androidfly.image.ZLAndroidImageData;
+import org.geometerplus.zlibrary.ui.androidfly.image.ZLAndroidImageManager;
 
 import org.geometerplus.fbreader.library.*;
 
@@ -62,7 +62,7 @@ public class BookInfoActivity extends Activity {
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 		Thread.setDefaultUncaughtExceptionHandler(
-			new org.geometerplus.zlibrary.ui.android.library.UncaughtExceptionHandler(this)
+			new org.geometerplus.zlibrary.ui.androidfly.library.UncaughtExceptionHandler(this)
 		);
 
 		final String path = getIntent().getStringExtra(CURRENT_BOOK_PATH_KEY);
@@ -149,7 +149,7 @@ public class BookInfoActivity extends Activity {
 	}
 
 	private void setupInfoPair(int id, String key, CharSequence value) {
-		LinearLayout layout = (LinearLayout)findViewById(id);
+		final LinearLayout layout = (LinearLayout)findViewById(id);
 		if (value == null || value.length() == 0) {
 			layout.setVisibility(View.GONE);
 			return;

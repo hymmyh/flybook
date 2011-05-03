@@ -27,7 +27,7 @@ import java.io.InputStreamReader;
 import org.geometerplus.fbreader.bookmodel.BookModel;
 import org.geometerplus.fbreader.library.Book;
 import org.geometerplus.fbreader.formats.FormatPlugin;
-import org.geometerplus.fbreader.formats.txt.SinoDetect;
+import org.geometerplus.fbreader.formats.txt.JustEncoding;
 import org.geometerplus.zlibrary.core.filesystem.ZLFile;
 import org.geometerplus.zlibrary.core.image.ZLImage;
 
@@ -43,7 +43,7 @@ public class HtmlPlugin extends FormatPlugin {
 	public boolean readMetaInfo(Book book) {
 		//活动 文档的 标题，作者，这类的东西
 		System.out.println("---++hym====readMetaInfo");
-		int enc = new SinoDetect().detectEncoding(new File(book.File.getPath()));
+		int enc = new JustEncoding().detectEncoding(new File(book.File.getPath()));
         System.out.println("encoding is ======"+enc);
 	    InputStream stream = null;
 	    try {
@@ -51,7 +51,7 @@ public class HtmlPlugin extends FormatPlugin {
             if (stream.available() <= 0) {
                 return false;
             }
-            book.setEncoding(SinoDetect.nicename[enc]);
+            book.setEncoding(JustEncoding.nicename[enc]);
 //            detectEncodingAndLanguage(book, stream);
             System.out.println("----hym--html-:"+book.getEncoding());
         } catch (IOException e) {
@@ -90,7 +90,7 @@ public class HtmlPlugin extends FormatPlugin {
             	System.out.println("----html title---"+tmp);
             }
         }catch (Exception e1) {
-            // TODO Auto-generated catch block
+            // 
             e1.printStackTrace();
         } finally {
             try {

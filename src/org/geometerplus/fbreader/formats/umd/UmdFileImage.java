@@ -20,7 +20,7 @@ public class UmdFileImage extends ZLSingleImage {
 	}
 	@Override
 	public byte[] byteData() {
-		// TODO Auto-generated method stub
+		// 
 		return img;
 	}
 	public String getURI() {

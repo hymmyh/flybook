@@ -28,8 +28,8 @@ import android.view.*;
 import org.geometerplus.zlibrary.core.filesystem.ZLFile;
 import org.geometerplus.zlibrary.core.image.*;
 
-import org.geometerplus.zlibrary.ui.android.library.ZLAndroidApplication;
-import org.geometerplus.zlibrary.ui.android.image.ZLAndroidImageData;
+import org.geometerplus.zlibrary.ui.androidfly.image.ZLAndroidImageData;
+import org.geometerplus.zlibrary.ui.androidfly.library.ZLAndroidApplication;
 
 public class ImageViewActivity extends Activity {
 	Bitmap myBitmap;
@@ -47,13 +47,13 @@ public class ImageViewActivity extends Activity {
 		);
 
 		Thread.setDefaultUncaughtExceptionHandler(
-			new org.geometerplus.zlibrary.ui.android.library.UncaughtExceptionHandler(this)
+			new org.geometerplus.zlibrary.ui.androidfly.library.UncaughtExceptionHandler(this)
 		);
 
 		setContentView(new ImageView());
 
 		final Uri uri = getIntent().getData();
-		if ("imagefile".equals(uri.getScheme())) {
+		if (ZLFileImage.SCHEME.equals(uri.getScheme())) {
 			try {
 				final String[] data = uri.getPath().split("\000");
 				final ZLFileImage image = new ZLFileImage(

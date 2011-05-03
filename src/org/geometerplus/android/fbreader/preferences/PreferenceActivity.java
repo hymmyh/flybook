@@ -20,14 +20,16 @@
 package org.geometerplus.android.fbreader.preferences;
 
 import android.content.Intent;
+import android.content.Context;
+import org.geometerplus.zlibrary.core.resources.ZLResource;
 
 import org.geometerplus.zlibrary.core.options.ZLIntegerOption;
 import org.geometerplus.zlibrary.core.options.ZLIntegerRangeOption;
 
 import org.geometerplus.zlibrary.text.view.style.*;
 
-import org.geometerplus.zlibrary.ui.android.library.ZLAndroidApplication;
-import org.geometerplus.zlibrary.ui.android.view.AndroidFontUtil;
+import org.geometerplus.zlibrary.ui.androidfly.library.ZLAndroidApplication;
+import org.geometerplus.zlibrary.ui.androidfly.view.AndroidFontUtil;
 
 import org.geometerplus.fbreader.fbreader.*;
 import org.geometerplus.fbreader.Paths;
@@ -37,6 +39,20 @@ public class PreferenceActivity extends ZLPreferenceActivity {
 	public PreferenceActivity() {
 		super("Preferences");
 	}
+	class PasswdPreference extends ZLStringPreference {//hym 加密码输入 控制
+		private final FBReaderApp myfbReader;
+
+		PasswdPreference(Context context, ZLResource rootResource, String resourceKey, FBReaderApp fbReader) {
+			super(context, rootResource, resourceKey);
+			myfbReader = fbReader;
+			setValue(fbReader.PasswdOption.getValue());
+		}
+
+		public void onAccept() {
+			myfbReader.PasswdOption.setValue(getValue());
+		}
+	}
+
 
 	@Override
 	protected void init(Intent intent) {
@@ -301,6 +317,29 @@ public class PreferenceActivity extends ZLPreferenceActivity {
 		footerPreferences.setEnabled(
 			fbReader.ScrollbarTypeOption.getValue() == FBView.SCROLLBAR_SHOW_AS_FOOTER
 		);
+		final Screen passwdScreen = createPreferenceScreen("passwd");// hym 密码输入
+		passwdScreen.addPreference(new ZLBooleanPreference(
+			this,
+			fbReader.AllowPasswdAdjustmentOption,
+			passwdScreen.Resource,
+			"allowPasswdAdjustment"
+		) {
+			public void onAccept() {
+				super.onAccept();
+				if (!isChecked()) {
+					
+					
+//					---
+//					androidApp.ScreenBrightnessLevelOption.setValue(0);
+				}
+			}
+		});
+		passwdScreen.addPreference(new PasswdPreference(
+				this,
+				passwdScreen.Resource,
+				"setpwd",
+				fbReader
+			) );
 
 		final Screen displayScreen = createPreferenceScreen("display");
 		displayScreen.addPreference(new ZLBooleanPreference(
@@ -378,5 +417,11 @@ public class PreferenceActivity extends ZLPreferenceActivity {
 			"navigateOverAllWords"
 		));
 		dictionaryScreen.addOption(fbReader.DictionaryTappingActionOption, "tappingAction");
+
+		final Screen cancelMenuScreen = createPreferenceScreen("cancelMenu");
+		cancelMenuScreen.addOption(fbReader.ShowPreviousBookInCancelMenuOption, "previousBook");
+		cancelMenuScreen.addOption(fbReader.ShowPositionsInCancelMenuOption, "positions");
+		cancelMenuScreen.addOption(fbReader.ShowGotoLibInCancelMenuOption, "gotoLib"); //hym 返回的本地藏书
+	
 	}
 }

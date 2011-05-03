@@ -29,20 +29,23 @@ import android.view.View;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.content.Intent;
 import android.graphics.Bitmap;
 
-import org.geometerplus.zlibrary.ui.android.R;
+import org.geometerplus.zlibrary.ui.androidfly.R;
 
 import org.geometerplus.zlibrary.core.resources.ZLResource;
 import org.geometerplus.zlibrary.core.image.ZLImage;
 import org.geometerplus.zlibrary.core.image.ZLLoadableImage;
 
-import org.geometerplus.zlibrary.ui.android.image.ZLAndroidImageManager;
-import org.geometerplus.zlibrary.ui.android.image.ZLAndroidImageData;
+import org.geometerplus.zlibrary.ui.androidfly.image.ZLAndroidImageManager;
+import org.geometerplus.zlibrary.ui.androidfly.image.ZLAndroidImageData;
 
-import org.geometerplus.fbreader.network.*;
+import org.geometerplus.fbreader.network.NetworkTree;
+import org.geometerplus.fbreader.network.NetworkBookItem;
+import org.geometerplus.fbreader.network.tree.NetworkBookTree;
 
 public class NetworkBookInfoActivity extends Activity implements NetworkView.EventListener {
 	private NetworkBookItem myBook;
@@ -55,41 +58,65 @@ public class NetworkBookInfoActivity extends Activity implements NetworkView.Eve
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 
-		if (!NetworkView.Instance().isInitialized()) {
-			finish();
-			return;
-		}
-
-		myBook = NetworkView.Instance().getBookInfoItem();
-		if (myBook == null) {
-			finish();
-			return;
-		}
-
-		myConnection = new BookDownloaderServiceConnection();
-		bindService(
-			new Intent(getApplicationContext(), BookDownloaderService.class),
-			myConnection,
-			BIND_AUTO_CREATE
-		);
-
-		setTitle(myBook.Title);
 		myMainView = getLayoutInflater().inflate(R.layout.network_book, null, false);
 		setContentView(myMainView);
 		myMainView.setOnCreateContextMenuListener(this);
+	}
 
-		setupDescription();
-		setupInfo();
-		setupCover();
-		setupButtons();
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		if (!NetworkView.Instance().isInitialized()) {
+			if (NetworkInitializer.Instance == null) {
+				new NetworkInitializer(null);
+				NetworkInitializer.Instance.start();
+			} else {
+				NetworkInitializer.Instance.setActivity(null);
+			}
+		}
+
+		if (myBook == null) {
+			final NetworkTree tree = Util.getTreeFromIntent(getIntent());
+			if (!(tree instanceof NetworkBookTree)) {
+				finish();
+				return;
+			}
+			myBook = ((NetworkBookTree)tree).Book;
+        
+			myConnection = new BookDownloaderServiceConnection();
+			bindService(
+				new Intent(getApplicationContext(), BookDownloaderService.class),
+				myConnection,
+				BIND_AUTO_CREATE
+			);
+        
+			setTitle(myBook.Title);
+        
+			setupDescription();
+			setupInfo();
+			setupCover();
+			setupButtons();
+		}
 	}
 
 	View getMainView() {
 		return myMainView;
 	}
 
+	private void setTextById(int id, CharSequence text) {
+		((TextView)findViewById(id)).setText(text);
+	}
+
+	private void setTextFromResource(int id, String resourceKey) {
+		setTextById(id, myResource.getResource(resourceKey).getValue());
+	}
+
 	@Override
 	public void onDestroy() {
+		if (!NetworkView.Instance().isInitialized() && NetworkInitializer.Instance != null) {
+			NetworkInitializer.Instance.setActivity(null);
+		}
 		if (myConnection != null) {
 			unbindService(myConnection);
 			myConnection = null;
@@ -99,86 +126,96 @@ public class NetworkBookInfoActivity extends Activity implements NetworkView.Eve
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
-		new RefillAccountActions().buildContextMenu(this, menu, new RefillAccountTree(myBook.Link));
+		NetworkView.Instance().getTopUpActions().buildContextMenu(this, menu, myBook.Link);
 	}
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		new RefillAccountActions().runAction(this, myBook.Link, item.getItemId());
+		RefillAccountActions.runAction(this, myBook.Link, item.getItemId());
 		return true;
 	}
 
 	private final void setupDescription() {
-		((TextView) findViewById(R.id.network_book_description_title)).setText(myResource.getResource("description").getValue());
+		setTextFromResource(R.id.network_book_description_title, "description");
 
-		final TextView descriptionView = (TextView) findViewById(R.id.network_book_description);
-		final String description;
-		if (myBook.Summary != null) {
-			description = myBook.Summary;
-		} else {
+		String description = myBook.Summary;
+		if (description == null) {
 			description = myResource.getResource("noDescription").getValue();
 		}
-		descriptionView.setText(description);
+		setTextById(R.id.network_book_description, description);
+	}
+
+	private void setPairLabelTextFromResource(int id, String resourceKey) {
+		final LinearLayout layout = (LinearLayout)findViewById(id);
+		((TextView)layout.findViewById(R.id.book_info_key))
+			.setText(myResource.getResource(resourceKey).getValue());
+	}
+
+	private void setPairValueText(int id, CharSequence text) {
+		final LinearLayout layout = (LinearLayout)findViewById(id);
+		((TextView)layout.findViewById(R.id.book_info_value)).setText(text);
 	}
 
 	private void setupInfo() {
-		((TextView) findViewById(R.id.network_book_info_title)).setText(myResource.getResource("bookInfo").getValue());
+		setTextFromResource(R.id.network_book_info_title, "bookInfo");
 
-		((TextView) findViewById(R.id.network_book_title_key)).setText(myResource.getResource("title").getValue());
-		((TextView) findViewById(R.id.network_book_authors_key)).setText(myResource.getResource("authors").getValue());
-		((TextView) findViewById(R.id.network_book_series_key)).setText(myResource.getResource("series").getValue());
-		((TextView) findViewById(R.id.network_book_series_index_key)).setText(myResource.getResource("indexInSeries").getValue());
-		((TextView) findViewById(R.id.network_book_tags_key)).setText(myResource.getResource("tags").getValue());
+		setPairLabelTextFromResource(R.id.network_book_title, "title");
+		setPairLabelTextFromResource(R.id.network_book_authors, "authors");
+		setPairLabelTextFromResource(R.id.network_book_series_title, "series");
+		setPairLabelTextFromResource(R.id.network_book_series_index, "indexInSeries");
+		setPairLabelTextFromResource(R.id.network_book_tags, "tags");
+		setPairLabelTextFromResource(R.id.network_book_catalog, "catalog");
 
-
-		((TextView) findViewById(R.id.network_book_title_value)).setText(myBook.Title);
+		setPairValueText(R.id.network_book_title, myBook.Title);
 
 		if (myBook.Authors.size() > 0) {
 			findViewById(R.id.network_book_authors).setVisibility(View.VISIBLE);
 			final StringBuilder authorsText = new StringBuilder();
-			for (NetworkBookItem.AuthorData author: myBook.Authors) {
+			for (NetworkBookItem.AuthorData author : myBook.Authors) {
 				if (authorsText.length() > 0) {
 					authorsText.append(", ");
 				}
 				authorsText.append(author.DisplayName);
 			}
-			((TextView) findViewById(R.id.network_book_authors_value)).setText(authorsText);
+			setPairValueText(R.id.network_book_authors, authorsText);
 		} else {
 			findViewById(R.id.network_book_authors).setVisibility(View.GONE);
 		}
 
 		if (myBook.SeriesTitle != null) {
-			findViewById(R.id.network_book_series).setVisibility(View.VISIBLE);
-			((TextView) findViewById(R.id.network_book_series_value)).setText(myBook.SeriesTitle);
+			findViewById(R.id.network_book_series_title).setVisibility(View.VISIBLE);
+			setPairValueText(R.id.network_book_series_title, myBook.SeriesTitle);
 			if (myBook.IndexInSeries > 0) {
-				((TextView) findViewById(R.id.network_book_series_index_value)).setText(String.valueOf(myBook.IndexInSeries));
+				setPairValueText(R.id.network_book_series_index, String.valueOf(myBook.IndexInSeries));
 				findViewById(R.id.network_book_series_index).setVisibility(View.VISIBLE);
 			} else {
 				findViewById(R.id.network_book_series_index).setVisibility(View.GONE);
 			}
 		} else {
-			findViewById(R.id.network_book_series).setVisibility(View.GONE);
+			findViewById(R.id.network_book_series_title).setVisibility(View.GONE);
 			findViewById(R.id.network_book_series_index).setVisibility(View.GONE);
 		}
 
 		if (myBook.Tags.size() > 0) {
 			findViewById(R.id.network_book_tags).setVisibility(View.VISIBLE);
 			final StringBuilder tagsText = new StringBuilder();
-			for (String tag: myBook.Tags) {
+			for (String tag : myBook.Tags) {
 				if (tagsText.length() > 0) {
 					tagsText.append(", ");
 				}
 				tagsText.append(tag);
 			}
-			((TextView) findViewById(R.id.network_book_tags_value)).setText(tagsText);
+			setPairValueText(R.id.network_book_tags, tagsText);
 		} else {
 			findViewById(R.id.network_book_tags).setVisibility(View.GONE);
 		}
+
+		setPairValueText(R.id.network_book_catalog, myBook.Link.getTitle());
 	}
 
 	private final void setupCover() {
 		final View rootView = findViewById(R.id.network_book_root);
-		final ImageView coverView = (ImageView) findViewById(R.id.network_book_cover);
+		final ImageView coverView = (ImageView)findViewById(R.id.network_book_cover);
 
 		final DisplayMetrics metrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -232,9 +269,11 @@ public class NetworkBookInfoActivity extends Activity implements NetworkView.Eve
 		};
 		final Set<NetworkBookActions.Action> actions = NetworkBookActions.getContextMenuActions(myBook, myConnection);
 
-		final boolean skipSecondButton = actions.size() < buttons.length && (actions.size() % 2) == 1;
+		final boolean skipSecondButton =
+			actions.size() < buttons.length &&
+			actions.size() % 2 == 1;
 		int buttonNumber = 0;
-		for (final NetworkBookActions.Action a: actions) {
+		for (final NetworkBookActions.Action a : actions) {
 			if (skipSecondButton && buttonNumber == 1) {
 				++buttonNumber;
 			}
@@ -250,12 +289,12 @@ public class NetworkBookInfoActivity extends Activity implements NetworkView.Eve
 			}
 
 			final int buttonId = buttons[buttonNumber++];
-			TextView button = (TextView) findViewById(buttonId);
+			TextView button = (TextView)findViewById(buttonId);
 			button.setText(text);
 			button.setVisibility(View.VISIBLE);
 			button.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
-					NetworkBookActions.runAction(NetworkBookInfoActivity.this, myBook, a.Id);
+					NetworkBookActions.runActionStatic(NetworkBookInfoActivity.this, myBook, a.Id);
 					NetworkBookInfoActivity.this.updateView();
 				}
 			});
@@ -305,7 +344,7 @@ public class NetworkBookInfoActivity extends Activity implements NetworkView.Eve
 		if (!NetworkView.Instance().isInitialized()) {
 			return null;
 		}
-		final NetworkDialog dlg = NetworkDialog.getDialog(id);
+		final AuthenticationDialog dlg = AuthenticationDialog.getDialog();
 		if (dlg != null) {
 			return dlg.createDialog(this);
 		}
@@ -316,9 +355,9 @@ public class NetworkBookInfoActivity extends Activity implements NetworkView.Eve
 	protected void onPrepareDialog(int id, Dialog dialog) {
 		super.onPrepareDialog(id, dialog);
 
-		final NetworkDialog dlg = NetworkDialog.getDialog(id);
+		final AuthenticationDialog dlg = AuthenticationDialog.getDialog();
 		if (dlg != null) {
 			dlg.prepareDialog(this, dialog);
-		}		
+		}
 	}
 }

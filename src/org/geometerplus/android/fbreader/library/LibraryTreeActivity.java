@@ -107,7 +107,7 @@ public class LibraryTreeActivity extends LibraryBaseActivity {
 			final LibraryAdapter adapter = new LibraryAdapter(tree.subTrees());
 			setListAdapter(adapter);
 			getListView().setOnCreateContextMenuListener(adapter);
-			System.err.println("SELECTED: " + adapter.getFirstSelectedItemIndex());
+//			System.err.println("SELECTED: " + adapter.getFirstSelectedItemIndex());
 			setSelection(adapter.getFirstSelectedItemIndex());
 		}
 	}

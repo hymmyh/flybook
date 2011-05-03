@@ -40,7 +40,7 @@ public class UmdPlugin extends FormatPlugin {
 		umdFile = new UMDFile();
 		boolean flag = umdFile.readmeta(book.File.getPath());
 		int pageNum = umdFile.getContentSize();
-		System.out.println("pageNum " + pageNum);
+//		System.out.println("pageNum " + pageNum);
 		book.addAuthor(umdFile.bookInfo.author);
 		book.setTitle(umdFile.bookInfo.title);
 		return flag;
@@ -48,7 +48,7 @@ public class UmdPlugin extends FormatPlugin {
 
 	@Override
 	public boolean readModel(BookModel model) {
-		// TODO Auto-generated method stub
+		// 
 		
 		return new UmdReader(model).readBook(model.Book.File);
 	}

@@ -30,6 +30,7 @@ import org.geometerplus.zlibrary.core.xml.ZLStringMap;
 import org.geometerplus.fbreader.network.INetworkLink;
 import org.geometerplus.fbreader.network.NetworkLibrary;
 import org.geometerplus.fbreader.network.NetworkCatalogItem;
+import org.geometerplus.fbreader.network.UrlInfo;
 import org.geometerplus.fbreader.network.atom.ATOMLink;
 import org.geometerplus.fbreader.network.atom.ATOMUpdated;
 import org.geometerplus.fbreader.network.authentication.NetworkAuthenticationManager;
@@ -98,8 +99,7 @@ class OPDSLinkXMLReader extends OPDSXMLReader implements OPDSConstants, MimeType
 			final String summary = entry.Content;
 			final String language = entry.DCLanguage;
 
-			String icon = null; 
-			final HashMap<String,String> links = new HashMap<String,String>();
+			final HashMap<String,UrlInfo> infos = new HashMap<String,UrlInfo>();
 			final HashMap<String,NetworkCatalogItem.Accessibility> urlConditions =
 				new HashMap<String,NetworkCatalogItem.Accessibility>();
 			for (ATOMLink link: entry.Links) {
@@ -108,34 +108,35 @@ class OPDSLinkXMLReader extends OPDSXMLReader implements OPDSConstants, MimeType
 				final String rel = link.getRel();
 				if (rel == REL_IMAGE_THUMBNAIL || rel == REL_THUMBNAIL) {
 					if (type == MIME_IMAGE_PNG || type == MIME_IMAGE_JPEG) {
-						icon = href;
+						infos.put(INetworkLink.URL_ICON, new UrlInfo(href));
 					}
 				} else if ((rel != null && rel.startsWith(REL_IMAGE_PREFIX)) || rel == REL_COVER) {
-					if (icon == null && (type == MIME_IMAGE_PNG || type == MIME_IMAGE_JPEG)) {
-						icon = href;
+					if (infos.get(INetworkLink.URL_ICON) == null &&
+						(type == MIME_IMAGE_PNG || type == MIME_IMAGE_JPEG)) {
+						infos.put(INetworkLink.URL_ICON, new UrlInfo(href));
 					}
 				} else if (rel == null) {
 					if (type == MIME_APP_ATOM) {
-						links.put(INetworkLink.URL_MAIN, href);
+						infos.put(INetworkLink.URL_MAIN, new UrlInfo(href));
 					}
 				} else if (rel == "search") {
 					if (type == MIME_APP_ATOM) {
 						final OpenSearchDescription descr = OpenSearchDescription.createDefault(href);
 						if (descr.isValid()) {
 							// TODO: May be do not use '%s'??? Use Description instead??? (this needs to rewrite SEARCH engine logic a little)
-							links.put(INetworkLink.URL_SEARCH, descr.makeQuery("%s"));
+							infos.put(INetworkLink.URL_SEARCH, new UrlInfo(descr.makeQuery("%s")));
 						}
 					}
 				} else if (rel == REL_LINK_SIGN_IN) {
-					links.put(INetworkLink.URL_SIGN_IN, href);
+					infos.put(INetworkLink.URL_SIGN_IN, new UrlInfo(href));
 				} else if (rel == REL_LINK_SIGN_OUT) {
-					links.put(INetworkLink.URL_SIGN_OUT, href);
+					infos.put(INetworkLink.URL_SIGN_OUT, new UrlInfo(href));
 				} else if (rel == REL_LINK_SIGN_UP) {
-					links.put(INetworkLink.URL_SIGN_UP, href);
+					infos.put(INetworkLink.URL_SIGN_UP, new UrlInfo(href));
 				} else if (rel == REL_LINK_REFILL_ACCOUNT) {
-					links.put(INetworkLink.URL_REFILL_ACCOUNT, href);
+					infos.put(INetworkLink.URL_REFILL_ACCOUNT, new UrlInfo(href));
 				} else if (rel == REL_LINK_RECOVER_PASSWORD) {
-					links.put(INetworkLink.URL_RECOVER_PASSWORD, href);
+					infos.put(INetworkLink.URL_RECOVER_PASSWORD, new UrlInfo(href));
 				} else if (rel == REL_CONDITION_NEVER) {
 					urlConditions.put(href, NetworkCatalogItem.Accessibility.NEVER);
 				} else if (rel == REL_CONDITION_SIGNED_IN) {
@@ -153,7 +154,7 @@ class OPDSLinkXMLReader extends OPDSXMLReader implements OPDSConstants, MimeType
 				sslCertificate = null;
 			}
 
-			INetworkLink result = link(siteName, title, summary, icon, language, links, urlConditions, sslCertificate);
+			INetworkLink result = link(siteName, title, summary, language, infos, urlConditions, sslCertificate);
 			if (result != null) {
 				myListener.onNewLink(result);
 			}
@@ -164,13 +165,12 @@ class OPDSLinkXMLReader extends OPDSXMLReader implements OPDSConstants, MimeType
 			String siteName,
 			String title,
 			String summary,
-			String icon,
 			String language,
-			Map<String,String> links,
+			Map<String,UrlInfo> infos,
 			HashMap<String,NetworkCatalogItem.Accessibility> urlConditions,
 			String sslCertificate
 		) {
-			if (siteName == null || title == null || links.get(INetworkLink.URL_MAIN) == null) {
+			if (siteName == null || title == null || infos.get(INetworkLink.URL_MAIN) == null) {
 				return null;
 			}
 
@@ -178,9 +178,8 @@ class OPDSLinkXMLReader extends OPDSXMLReader implements OPDSConstants, MimeType
 				siteName,
 				title,
 				summary,
-				icon,
 				language,
-				links,
+				infos,
 				myHasStableIdentifiers
 			);
 
@@ -291,28 +290,10 @@ class OPDSLinkXMLReader extends OPDSXMLReader implements OPDSConstants, MimeType
 					}
 					return false;
 				} else if (tag == FBREADER_REWRITING_RULE) {
-					final String type = attributes.getValue("type");
-					final String apply = attributes.getValue("apply");
-					final String name = attributes.getValue("name");
-					final String value = attributes.getValue("value");
-					final int typeValue;
-					if (type == "addUrlParameter") {
-						typeValue = URLRewritingRule.ADD_URL_PARAMETER;
-					} else {
-						return false;
-					}
-					final int applyValue;
-					if (apply == "external") {
-						applyValue = URLRewritingRule.APPLY_EXTERNAL;
-					} else if (apply == "internal") {
-						applyValue = URLRewritingRule.APPLY_INTERNAL;
-					} else {
-						applyValue = URLRewritingRule.APPLY_ALWAYS;
-					}
-					((LinkReader) myFeedReader).addUrlRewritingRule(new URLRewritingRule(typeValue, applyValue, name, value));
+					((LinkReader)myFeedReader).addUrlRewritingRule(new URLRewritingRule(attributes));
 					return false;
 				} else if (tag == FBREADER_STABLE_IDENTIFIERS) {
-					((LinkReader) myFeedReader).setHasStableIdentifiers(true);
+					((LinkReader)myFeedReader).setHasStableIdentifiers(true);
 					return false;
 				} else if (tag == FBREADER_EXTRA) {
 					final String name = attributes.getValue("name");

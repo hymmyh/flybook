@@ -66,7 +66,7 @@ public class HtmlMetaInfoReader extends ZLXMLReaderAdapter {
 	}
 
 	public void characterDataHandler(char[] ch, int start, int length) {
-		// TODO + length -- remove
+		// 
 		final String text = new String(ch).substring(start, start + length);
 		if (myReadTitle) {
 			myBook.setTitle(myBook.getTitle() + text);

@@ -36,7 +36,7 @@ import android.view.ContextMenu;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
 import org.geometerplus.zlibrary.core.network.ZLNetworkException;
 
-import org.geometerplus.zlibrary.ui.android.R;
+import org.geometerplus.zlibrary.ui.androidfly.R;
 
 import org.geometerplus.android.util.UIUtil;
 import org.geometerplus.android.fbreader.FBReader;
@@ -49,8 +49,6 @@ import org.geometerplus.fbreader.network.authentication.NetworkAuthenticationMan
 
 
 class NetworkBookActions extends NetworkTreeActions {
-	private static final String PACKAGE = "org.geometerplus.android.fbreader.network";
-
 	public static final int DOWNLOAD_BOOK_ITEM_ID = 0;
 	public static final int DOWNLOAD_DEMO_ITEM_ID = 1;
 	public static final int READ_BOOK_ITEM_ID = 2;
@@ -60,8 +58,11 @@ class NetworkBookActions extends NetworkTreeActions {
 	public static final int BUY_DIRECTLY_ITEM_ID = 6;
 	public static final int BUY_IN_BROWSER_ITEM_ID = 7;
 	public static final int SHOW_BOOK_ACTIVITY_ITEM_ID = 8;
-
 	public static final int SHOW_BOOKS_ITEM_ID = 9;
+	public static final int ADD_BOOK_TO_BASKET = 10;
+	public static final int REMOVE_BOOK_FROM_BASKET = 11;
+	public static final int ADD_CATALOG_TO_FAVORITES = 12;
+	public static final int REMOVE_CATALOG_FROM_FAVORITES = 13;
 
 	private static boolean useFullReferences(NetworkBookItem book) {
 		return book.reference(BookReference.Type.DOWNLOAD_FULL) != null ||
@@ -184,6 +185,14 @@ class NetworkBookActions extends NetworkTreeActions {
 				final String price = ((BuyBookReference) reference).Price;
 				actions.add(new Action(id, "buy", price));
 			}
+			final Basket basket = book.Link.basket();
+			if (basket != null) {
+				if (basket.contains(book)) {
+					actions.add(new Action(REMOVE_BOOK_FROM_BASKET, "removeFromBasket"));
+				} else {
+					actions.add(new Action(ADD_BOOK_TO_BASKET, "addToBasket"));
+				}
+			}
 		}
 		return actions;
 	}
@@ -215,29 +224,29 @@ class NetworkBookActions extends NetworkTreeActions {
 	public boolean runAction(NetworkBaseActivity activity, NetworkTree tree, int actionCode) {
 		if (tree instanceof NetworkAuthorTree || tree instanceof NetworkSeriesTree) {
 			switch (actionCode) {
-			case SHOW_BOOKS_ITEM_ID:
-				showBooks(activity, tree);
-				return true;
+				case SHOW_BOOKS_ITEM_ID:
+					Util.openTree(activity, tree);
+					return true;
 			}
 			return false;
-		}
-		return runAction(activity, ((NetworkBookTree) tree).Book, actionCode);
-	}
-
-
-	private void showBooks(NetworkBaseActivity activity, NetworkTree tree) {
-		String key = null;
-		if (tree instanceof NetworkAuthorTree) {
-			key = PACKAGE + ".Authors:" + ((NetworkAuthorTree) tree).Author.DisplayName;
-		} else if (tree instanceof NetworkSeriesTree) {
-			key = PACKAGE + ".Series:" + ((NetworkSeriesTree) tree).SeriesTitle;
-		}
-		if (key != null) {
-			NetworkView.Instance().openTree(activity, tree, key);
+		} else if (tree instanceof NetworkBookTree) {
+			return runActionStatic(activity, ((NetworkBookTree)tree), actionCode);
+		} else {
+			return false;
 		}
 	}
 
-	static boolean runAction(Activity activity, NetworkBookItem book, int actionCode) {
+	static boolean runActionStatic(Activity activity, NetworkBookTree tree, int actionCode) {
+		switch (actionCode) {
+			case SHOW_BOOK_ACTIVITY_ITEM_ID:
+				Util.openTree(activity, tree);
+				return true;
+			default:
+				return runActionStatic(activity, tree.Book, actionCode);
+		}
+	}
+
+	static boolean runActionStatic(Activity activity, NetworkBookItem book, int actionCode) {
 		switch (actionCode) {
 			case DOWNLOAD_BOOK_ITEM_ID:
 				doDownloadBook(activity, book, false);
@@ -263,8 +272,11 @@ class NetworkBookActions extends NetworkTreeActions {
 			case BUY_IN_BROWSER_ITEM_ID:
 				doBuyInBrowser(activity, book);
 				return true;
-			case SHOW_BOOK_ACTIVITY_ITEM_ID:
-				NetworkView.Instance().showBookInfoActivity(activity, book);
+			case ADD_BOOK_TO_BASKET:
+				book.Link.basket().add(book);
+				return true;
+			case REMOVE_BOOK_FROM_BASKET:
+				book.Link.basket().remove(book);
 				return true;
 		}
 		return false;
@@ -308,7 +320,7 @@ class NetworkBookActions extends NetworkTreeActions {
 					Uri.fromFile(new File(local)),
 					activity.getApplicationContext(),
 					FBReader.class
-				).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+				).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
 			);
 		}
 	}
@@ -450,7 +462,7 @@ class NetworkBookActions extends NetworkTreeActions {
 			}
 		} catch (ZLNetworkException e) {
 		}
-		NetworkDialog.show(activity, NetworkDialog.DIALOG_AUTHENTICATION, book.Link, buyRunnable);
+		AuthenticationDialog.show(activity, book.Link, buyRunnable);
 	}
 
 	private static void doBuyInBrowser(Activity activity, final NetworkBookItem book) {

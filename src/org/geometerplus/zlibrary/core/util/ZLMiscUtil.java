@@ -26,7 +26,9 @@ public abstract class ZLMiscUtil {
 	public static <T> boolean equals(T o0, T o1) {
 		return (o0 == null) ? (o1 == null) : o0.equals(o1);
 	}
-
+	public static int hashCode(Object o) {
+		return o != null ? o.hashCode() : 0;
+	}
 	public static <T> boolean listsEquals(List<T> list1, List<T> list2) {
 		if (list1 == null) {
 			return list2 == null || list2.isEmpty();

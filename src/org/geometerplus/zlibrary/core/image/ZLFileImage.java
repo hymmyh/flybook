@@ -20,9 +20,12 @@
 package org.geometerplus.zlibrary.core.image;
 
 import java.io.*;
+
 import org.geometerplus.zlibrary.core.filesystem.ZLFile;
 
 public class ZLFileImage extends ZLSingleImage {
+	public static final String SCHEME = "imagefile";
+
 	private final ZLFile myFile;
 	private final int myOffset;
 	private final int myLength;
@@ -37,9 +40,11 @@ public class ZLFileImage extends ZLSingleImage {
 	public ZLFileImage(String mimeType, ZLFile file) {
 		this(mimeType, file, 0, (int)file.size());
 	}
+
 	public String getURI() {
-		return "imagefile://" + myFile.getPath() + "\000" + myOffset + "\000" + myLength;
+		return SCHEME + "://" + myFile.getPath() + "\000" + myOffset + "\000" + myLength;
 	}
+
 	@Override
 	public byte[] byteData() {
 		InputStream stream = null;

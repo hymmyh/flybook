@@ -30,7 +30,7 @@ import org.geometerplus.fbreader.network.*;
 public class NetworkCatalogTree extends NetworkTree {
 
 	public final NetworkCatalogItem Item;
-	public final ArrayList<NetworkLibraryItem> ChildrenItems = new ArrayList<NetworkLibraryItem>();
+	public final ArrayList<NetworkItem> ChildrenItems = new ArrayList<NetworkItem>();
 
 	private long myLoadedTime = -1;
 
@@ -43,10 +43,14 @@ public class NetworkCatalogTree extends NetworkTree {
 		super(parent, position);
 		Item = item;
 	}
-
+	//书库的名字  如果是 shucang 改成中文  书仓
 	@Override
 	public String getName() {
-		return Item.Title;
+//		System.out.println("--------hym---name:"+Item.Title);
+		if(Item.Title!=null&&Item.Title.indexOf("Shucang")!=-1){
+			return "书仓";
+		}else
+			return Item.Title;
 	}
 
 	@Override
@@ -54,6 +58,9 @@ public class NetworkCatalogTree extends NetworkTree {
 		if (Item.Summary == null) {
 			return "";
 		}
+		if(Item.Title!=null&&Item.Title.indexOf("Shucang")!=-1){
+			return "书仓: 中文在线书库";
+		}else
 		return Item.Summary;
 	}
 
@@ -89,7 +96,7 @@ public class NetworkCatalogTree extends NetworkTree {
 		int nodeCount = 0;
 
 		for (int i = 0; i < ChildrenItems.size(); ++i) {
-			NetworkLibraryItem currentItem = ChildrenItems.get(i);
+			NetworkItem currentItem = ChildrenItems.get(i);
 			if (!(currentItem instanceof NetworkCatalogItem)) {
 				continue;
 			}
@@ -161,13 +168,17 @@ public class NetworkCatalogTree extends NetworkTree {
 	}
 
 	@Override
-	public NetworkLibraryItem getHoldedItem() {
+	public NetworkItem getHoldedItem() {
 		return Item;
 	}
 
 	@Override
-	public void removeItems(Set<NetworkLibraryItem> items) {
+	public void removeItems(Set<NetworkItem> items) {
 		ChildrenItems.removeAll(items);
 		super.removeItems(items);
+	}
+	@Override
+	protected String getStringId() {
+		return Item.getStringId();
 	}
 }

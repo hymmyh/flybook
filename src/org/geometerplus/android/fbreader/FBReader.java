@@ -45,9 +45,9 @@ import org.geometerplus.zlibrary.text.view.ZLTextWordCursor;
 import org.geometerplus.zlibrary.text.view.ZLTextView;
 import org.geometerplus.zlibrary.text.hyphenation.ZLTextHyphenator;
 
-import org.geometerplus.zlibrary.ui.android.R;
-import org.geometerplus.zlibrary.ui.android.library.ZLAndroidActivity;
-import org.geometerplus.zlibrary.ui.android.library.ZLAndroidApplication;
+import org.geometerplus.zlibrary.ui.androidfly.R;
+import org.geometerplus.zlibrary.ui.androidfly.library.ZLAndroidActivity;
+import org.geometerplus.zlibrary.ui.androidfly.library.ZLAndroidApplication;
 
 import org.geometerplus.fbreader.fbreader.ActionCode;
 import org.geometerplus.fbreader.fbreader.FBReaderApp;
@@ -236,6 +236,7 @@ public final class FBReader extends ZLAndroidActivity {
 				}
 			};
 			UIUtil.wait("search", runnable, this);
+			startActivity(new Intent(this, getClass()));
 		} else {
 			super.onNewIntent(intent);
 		}

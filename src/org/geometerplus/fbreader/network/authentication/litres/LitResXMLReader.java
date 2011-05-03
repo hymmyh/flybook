@@ -31,7 +31,7 @@ import org.geometerplus.fbreader.network.opds.HtmlToString;
 class LitResXMLReader extends LitResAuthenticationXMLReader {
 
 	public final INetworkLink Link;
-	public final List<NetworkLibraryItem> Books;
+	public final List<NetworkItem> Books;
 
 	private int myIndex;
 
@@ -52,10 +52,9 @@ class LitResXMLReader extends LitResAuthenticationXMLReader {
 	private LinkedList<NetworkBookItem.AuthorData> myAuthors = new LinkedList<NetworkBookItem.AuthorData>();
 
 	private LinkedList<String> myTags = new LinkedList<String>();
-	private HashMap<Integer, String> myURLByType = new HashMap<Integer, String>(); // TODO: remove
 	private LinkedList<BookReference> myReferences = new LinkedList<BookReference>();
 
-	public LitResXMLReader(INetworkLink link, List<NetworkLibraryItem> books) {
+	public LitResXMLReader(INetworkLink link, List<NetworkItem> books) {
 		super(link.getSiteName());
 		Link = link;
 		Books = books;
@@ -121,11 +120,6 @@ class LitResXMLReader extends LitResAuthenticationXMLReader {
 			if (TAG_BOOK == tag) {
 				myBookId = attributes.getValue("hub_id");
 				myCover = attributes.getValue("cover_preview");
-
-				final String url = attributes.getValue("url");
-				if (url != null) {
-					myURLByType.put(NetworkCatalogItem.URL_HTML_PAGE, url);
-				}
 
 				myReferences.add(new BookReference(
 					"https://robot.litres.ru/pages/catalit_download_book/?art=" + myBookId,
@@ -238,7 +232,6 @@ class LitResXMLReader extends LitResAuthenticationXMLReader {
 				myIndexInSeries = 0;
 				myAuthors.clear();
 				myTags.clear();
-				myURLByType.clear();
 				myReferences.clear();
 				myState = CATALOG;
 			}

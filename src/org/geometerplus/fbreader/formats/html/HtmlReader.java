@@ -90,14 +90,16 @@ public class HtmlReader extends BookReader implements ZLHtmlReader {
 	public boolean readBook() throws IOException {
 		System.out.println("----hym--readbook html-");
 		return ZLHtmlProcessor.read(this, getInputStreamReader());
+		//hym 修改 getInputStream 改成了 getInputStreamReader
 	}
-
+	//hym 修改 getInputStream 改成了 getInputStreamReader 会影响继承他的子类，都要检查一下
 	public InputStreamReader getInputStreamReader() throws IOException {
 		System.out.println("---12---"+Model.Book.getEncoding());
 		return new InputStreamReader(Model.Book.File.getInputStream( ),Model.Book.getEncoding());
 	}
 
 	public void startDocumentHandler() {
+		setMainTextModel();//hym 添加，不然 mobipockethtmlbookreader 会出错。
 	}
 
 	public void endDocumentHandler() {
@@ -326,6 +328,7 @@ public class HtmlReader extends BookReader implements ZLHtmlReader {
 				break;
 
 			case HtmlTag.BODY:
+				popAllKind();//hym
 				break;
 
 			case HtmlTag.HTML:
@@ -360,7 +363,7 @@ public class HtmlReader extends BookReader implements ZLHtmlReader {
 	}
 
 	public final void startElementHandler(String tagName, int offset, ZLHtmlAttributeMap attributes) {
-		System.out.println("hym---html:start->"+tagName);
+//		System.out.println("hym---html:start->"+tagName);
 		if(HtmlTag.getTagByName(tagName)==HtmlTag.PRE)
 			this.preflag=false;
 		startElementHandler(HtmlTag.getTagByName(tagName), offset, attributes);
@@ -373,7 +376,7 @@ public class HtmlReader extends BookReader implements ZLHtmlReader {
 
 			case HtmlTag.BODY:
 				setMainTextModel();
-				pushKind(FBTextKind.REGULAR);
+				pushOneKind(FBTextKind.REGULAR);//hym
 				beginParagraph(ZLTextParagraph.Kind.TEXT_PARAGRAPH);
 				break;
 

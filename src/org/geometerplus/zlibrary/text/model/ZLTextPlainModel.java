@@ -29,15 +29,15 @@ public class ZLTextPlainModel implements ZLTextModel {
 	protected final String myId;
 	private final String myLanguage;
 
-	protected int[] myStartEntryIndices;
-	protected int[] myStartEntryOffsets;
-	protected int[] myParagraphLengths;
-	protected int[] myTextSizes;
-	protected byte[] myParagraphKinds;
+	protected int[] myStartEntryIndices;//++
+	protected int[] myStartEntryOffsets;//++
+	protected int[] myParagraphLengths;//++
+	protected int[] myTextSizes;//++
+	protected byte[] myParagraphKinds;//++
 	
 	protected int myParagraphsNumber;
 
-	protected final CharStorage myStorage;
+	protected final CharStorage myStorage;//++ 保存 还有 tree image imageinfo
 	private ArrayList<ZLTextMark> myMarks;
 
 	protected final ZLImageMap myImageMap;
@@ -213,7 +213,7 @@ public class ZLTextPlainModel implements ZLTextModel {
 			return myImageMap.size();
 		}
 	}
-	//按顺序保存 章节号码
+	//按顺序保存 章节号码  最好是能保存 宽和高在里面
 	public void addImgList(String id) {
 		imglist.add(id);
 //		myImageMap.put(id, image);

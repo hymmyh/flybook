@@ -45,6 +45,7 @@ public abstract class PdbStream extends InputStream {
 	}
 	
 	public int read() {
+//		System.out.println("-hym---mobi--compress---4--");
 		if (!fillBuffer()) {
 			return -1;
 		}
@@ -52,6 +53,7 @@ public abstract class PdbStream extends InputStream {
 	}
 
 	public int read(byte[] buffer, int offset, int maxSize) {
+		
 		int realSize = 0;
 		while (realSize < maxSize) {
 			if (!fillBuffer()) {
@@ -66,6 +68,7 @@ public abstract class PdbStream extends InputStream {
 				myBufferOffset += size;
 			}
 		}
+//		System.out.println("-hym---mobi--compress---3--"+realSize);
 		return (realSize > 0) ? realSize : -1;
 	}
 	

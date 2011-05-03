@@ -69,20 +69,20 @@ public class TxtPlugin extends FormatPlugin {
 
 	@Override
 	public String readAnnotation(ZLFile file) {
-		// TODO Auto-generated method stub
+		// 
 		return "flybook-txt";
 	}
 
 	@Override
 	public ZLImage readCover(ZLFile file) {
-		// TODO Auto-generated method stub
+		// 
 		return null;
 	}
 
 	@Override
 	public boolean readMetaInfo(Book book) {
 		// 用了确认一下 编码
-		int enc = new SinoDetect().detectEncoding(new File(book.File.getPath()));
+		int enc = new JustEncoding().detectEncoding(new File(book.File.getPath()));
 //        System.out.println("encoding is 1======"+enc);
 	    InputStream stream = null;
 	    try {
@@ -90,7 +90,7 @@ public class TxtPlugin extends FormatPlugin {
             if (stream.available() <= 0) {
                 return false;
             }
-            book.setEncoding(SinoDetect.nicename[enc]);
+            book.setEncoding(JustEncoding.nicename[enc]);
 //            detectEncodingAndLanguage(book, stream);
 //            System.out.println(book.getEncoding());
         } catch (IOException e) {
@@ -112,7 +112,7 @@ public class TxtPlugin extends FormatPlugin {
 
 	@Override
 	public boolean readModel(BookModel model) {
-		// TODO Auto-generated method stub
+		// 
 		return new TxtReader(model).readBook(model.Book.File);
 	}
 }

@@ -28,12 +28,12 @@ import org.geometerplus.zlibrary.core.application.ZLApplication;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
 import org.geometerplus.zlibrary.core.tree.ZLTree;
 
-import org.geometerplus.zlibrary.ui.android.R;
+import org.geometerplus.zlibrary.ui.androidfly.R;
 
 import org.geometerplus.zlibrary.text.view.ZLTextWordCursor;
 import org.geometerplus.fbreader.bookmodel.TOCTree;
 import org.geometerplus.fbreader.fbreader.FBReaderApp;
-
+// 显示 书的 目录
 public class TOCActivity extends ListActivity {
 	private TOCAdapter myAdapter;
 	private ZLTree<?> mySelectedItem;
@@ -42,7 +42,7 @@ public class TOCActivity extends ListActivity {
 	public void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
 
-		Thread.setDefaultUncaughtExceptionHandler(new org.geometerplus.zlibrary.ui.android.library.UncaughtExceptionHandler(this));
+		Thread.setDefaultUncaughtExceptionHandler(new org.geometerplus.zlibrary.ui.androidfly.library.UncaughtExceptionHandler(this));
 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -115,7 +115,7 @@ public class TOCActivity extends ListActivity {
 			((TextView)view.findViewById(R.id.toc_tree_item_text)).setText(tree.getText());
 			return view;
 		}
-
+		// hym 跳转到目录
 		void openBookText(TOCTree tree) {
 			final TOCTree.Reference reference = tree.getReference();
 			if (reference != null) {

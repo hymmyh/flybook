@@ -50,6 +50,18 @@
 		<node name="removeFromFavorites" value="Supprimer des favoris"/>
 	</node>
 	<node name="networkView">
+		<node name="byAuthor" value="Par auteur">
+			<node name="summary" value="Livres triés par auteur"/>
+		</node>
+		<node name="byTitle" value="By title" toBeTranslated="true">
+			<node name="summary" value="Books sorted by title" toBeTranslated="true"/>
+		</node>
+		<node name="byDate" value="By date" toBeTranslated="true">
+			<node name="summary" value="Books sorted by date of purchasing" toBeTranslated="true"/>
+		</node>
+		<node name="bySeries" value="By series" toBeTranslated="true">
+			<node name="summary" value="Books sorted by series" toBeTranslated="true"/>
+		</node>
 		<node name="openCatalog" value="Ouvrir le catalogue"/>
 		<node name="showResults" value="Afficher les résultats"/>
 		<node name="showBooks" value="Afficher les livres"/>
@@ -60,6 +72,8 @@
 		<node name="deleteDemo" value="Supprimer l'extrait"/>
 		<node name="downloadDemo" value="Télécharger l'extrait"/>
 		<node name="buy" value="Acheter (%s)"/>
+		<node name="addToBasket" value="Add to basket" toBeTranslated="true"/>
+		<node name="removeFromBasket" value="Remove from basket" toBeTranslated="true"/>
 		<node name="openInBrowser" value="Ouvrir dans un navigateur" />
 		<node name="stopLoading" value="Arrêt du chargement" />
 		<node name="stopSearching" value="Arrêt de la recherche" />
@@ -112,6 +126,7 @@
 		<node name="series" value="Série:" />
 		<node name="indexInSeries" value="Index dans les séries:" />
 		<node name="tags" value="Tags:" />
+		<node name="catalog" value="Catalog:" toBeTranslated="true"/>
 	</node>
 	<node name="bookInfo">
 		<node name="bookInfo" value="Informations sur le livre" />
@@ -242,6 +257,10 @@
 				<node name="showStatusBar" value="Barre de statut">
 					<node name="summaryOn" value="Afficher la barre de statut en mode lecture"/>
 					<node name="summaryOff" value="Cacher la barre de statut en mode lecture"/>
+				</node>
+				<node name="showStatusBarWhenMenuIsActive" value="Show status bar when menu is active" toBeTranslated="true">
+					<node name="summaryOn" value="Show status bar when menu becomes active" toBeTranslated="true"/>
+					<node name="summaryOff" value="Don't show status bar when menu becomes active" toBeTranslated="true"/>
 				</node>
 			</node>
 			<node name="text" value="Texte">
@@ -511,6 +530,17 @@
 					<node name="summaryOff" value="La navigation par touches visite les liens hypertexts uniquement"/>
 				</node>
 			</node>
+			<node name="cancelMenu" value="Cancel menu" toBeTranslated="true">
+				<node name="summary" value="Back button action list" toBeTranslated="true"/>
+				<node name="previousBook" value="Previous book" toBeTranslated="true">
+					<node name="summaryOn" value="Show 'return to previous book' item" toBeTranslated="true"/>
+					<node name="summaryOff" value="Don't show 'return to previous book' item" toBeTranslated="true"/>
+				</node>
+				<node name="positions" value="Last 3 positions" toBeTranslated="true">
+					<node name="summaryOn" value="Show items for last 3 positions in the book" toBeTranslated="true"/>
+					<node name="summaryOff" value="Don't show items for last 3 positions in the book" toBeTranslated="true"/>
+				</node>
+			</node>
 		</node>
 		<node name="OptionsDialog">
 			<node name="tab">
@@ -558,10 +588,6 @@
 			<node name="noRequiredInformation" value="Certaines informations requises sont absentes du catalogue" />
 			<node name="cacheDirectoryError" value="Impossible de créer le répertoire contenant le cache" />
 		</node>
-		<node name="emptyCatalogBox">
-			<node name="title" value="Information"/>
-			<node name="message" value="Le catalogue est vide"/>
-		</node>
 		<node name="emptySearchResults">
 			<node name="title" value="Résultats de la recherche" />
 			<node name="message" value="Aucun livre correspondant trouvé." />
@@ -575,7 +601,7 @@
 			<node name="register" value="Inscription"/>
 		</node>
 		<node name="CustomCatalogDialog">
-			<node name="title" value="Catalogue personalisé" />
+			<node name="title" value="FBReader: add custom catalog" toBeTranslated="true" />
 			<node name="catalogTitle" value="Titre" />
 			<node name="catalogUrl" value="Adresse du catalogue sur le réseau" />
 			<node name="catalogSummary" value="Description" />
@@ -609,6 +635,8 @@
 		<node name="dictionaryIsNotInstalled" value="Désolé mais le dictionnaire n'est pas installé"/>
 		<node name="permissionDenied" value="Désolé, accès refusé"/>
 		<node name="noFavorites" value="Votre liste de favoris est vide"/>
+		<node name="emptyCatalog" value="Le catalogue est vide"/>
+		<node name="emptyBasket" value="Your basket is empty, sorry" toBeTranslated="true"/>
 	</node>
 	<node name="external">
 		<node name="browser" value="Navigateur"/>

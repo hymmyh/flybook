@@ -29,7 +29,7 @@ import android.view.Window;
 import android.widget.ListView;
 
 import org.geometerplus.zlibrary.core.resources.ZLResource;
-import org.geometerplus.zlibrary.ui.android.R;
+import org.geometerplus.zlibrary.ui.androidfly.R;
 
 import org.geometerplus.fbreader.library.Library;
 import org.geometerplus.fbreader.tree.FBTree;

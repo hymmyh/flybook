@@ -174,7 +174,7 @@ public class UMDFile {
 			System.arraycopy(newBytes, 0, strBytes, 0, Math.min(strBytes.length, inflater1.getTotalOut()));
 			tempStr = new String(IntergerUtil.getReverseBytes(strBytes), "UNICODE").replace("\u2029", "\n");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// 
 			e.printStackTrace();
 		} 
 		return tempStr;
@@ -251,7 +251,7 @@ public class UMDFile {
 			}
 			is.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// 
 			e.printStackTrace();
 		}
 	}
@@ -273,7 +273,7 @@ public class UMDFile {
 				try {
 					is.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					// 
 					e.printStackTrace();
 				}
 			}
@@ -287,14 +287,14 @@ public class UMDFile {
 			is = new DataInputStream(new FileInputStream(bookPath));
 			return readmeta(is);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// 
 			e.printStackTrace();
 		}finally{
 			if(is != null){
 				try {
 					is.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					// 
 					e.printStackTrace();
 				}
 			}
@@ -345,7 +345,7 @@ public class UMDFile {
 //			is.close();
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// 
 			System.out.println("read errs " + e);
 			e.printStackTrace();
 			return false;
@@ -359,14 +359,14 @@ public class UMDFile {
 			is = new DataInputStream(new FileInputStream(bookPath));
 			return readcover(is,size);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// 
 			e.printStackTrace();
 		}finally{
 			if(is != null){
 				try {
 					is.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					// 
 					e.printStackTrace();
 				}
 			}
@@ -414,7 +414,7 @@ public class UMDFile {
 //			is.close();
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// 
 			System.out.println("read errs " + e);
 			e.printStackTrace();
 			return false;
@@ -428,14 +428,14 @@ public class UMDFile {
 			is = new DataInputStream(new FileInputStream(bookPath));
 			return read(is);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// 
 			e.printStackTrace();
 		}finally{
 			if(is != null){
 				try {
 					is.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					// 
 					e.printStackTrace();
 				}
 			}
@@ -486,7 +486,7 @@ public class UMDFile {
 //			is.close();
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// 
 			System.out.println("read errs " + e);
 			e.printStackTrace();
 			return false;

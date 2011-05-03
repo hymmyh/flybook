@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-//hym 改动 为了 html 中文
+
 package org.geometerplus.fbreader.network.opds;
 
 import java.util.HashMap;
@@ -31,7 +31,7 @@ import org.geometerplus.zlibrary.core.xml.ZLStringMap;
 import org.geometerplus.fbreader.formats.xhtml.XHTMLReader;
 import org.geometerplus.fbreader.network.atom.ATOMConstants;
 
-public class HtmlToString {
+public class HtmlToString {//hym 改动 为了 html 中文
 	private String myLastOpenedTag;
 	private String myTextType;
 	private StringBuilder myTextContent = new StringBuilder();
@@ -108,7 +108,7 @@ public class HtmlToString {
 	private static class HtmlToStringReader implements ZLHtmlReader {
 
 		private StringBuilder myBuffer = new StringBuilder();
-		private char[] myByteData;
+		private  char[] myByteData;//hym 修改 byte --》char
 		private int myByteDataLength;
 		private HashMap<String,char[]> myEntityMap;
 
@@ -240,7 +240,7 @@ public class HtmlToString {
 			myBuffer.append(data);
 		}
 
-		public void charDataHandler(char[] data, int start, int length) {
+		public void charDataHandler(char[] data, int start, int length) {//hym 修改 byte --》char
 			if (length <= 0) {
 				return;
 			}

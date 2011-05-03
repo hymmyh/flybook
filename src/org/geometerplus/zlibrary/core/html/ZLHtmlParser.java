@@ -46,6 +46,7 @@ final class ZLHtmlParser {
 	private static final byte D_ATTRIBUTE_VALUE = 18;
 	private static final byte SCRIPT = 19;
 	private static final byte ENTITY_REF = 20;
+	private static final byte STYLE = 25;//hym 加 和SCRIPT 一样处理
 	
 	private static ZLCharBuffer unique(HashMap<ZLCharBuffer,ZLCharBuffer> strings, ZLCharBuffer container) {
 		ZLCharBuffer s = strings.get(container);
@@ -68,9 +69,8 @@ final class ZLHtmlParser {
 		myReader = htmlReader;
 		myStream = new InputStreamReader(stream);
 	}
-
-	public void doIt() throws IOException {
-		final InputStreamReader stream = myStream;
+	public void doIt(char[] buffer) throws IOException {//在分析前 可以对数据进行预处理
+		
 		final ZLHtmlReader htmlReader = myReader;
 //		byte[] buffer = new byte[8192];
 		final ZLCharBuffer tagName = new ZLCharBuffer();
@@ -80,24 +80,16 @@ final class ZLHtmlParser {
 		final HashMap<ZLCharBuffer,ZLCharBuffer> strings = new HashMap<ZLCharBuffer,ZLCharBuffer>();
 		final ZLHtmlAttributeMap attributes = new ZLHtmlAttributeMap();
 		boolean scriptOpened = false;
+		boolean styleOpened = false;
 		//boolean html = false;
 		int bufferOffset = 0;
 		int offset = 0;
-		char[] buffer = new char[4096];
+		final int count = buffer.length;
+		if (count <= 0) {
+			return;
+		}
 		byte state = START_DOCUMENT;
-		while (true) {
-			final int count = stream.read(buffer);
-			if (count <= 0) {
-				return;
-			}
-//			if (count < buffer.length) {
-//				buffer = ZLArrayUtils.createCopy(buffer, count, count);
-//			}
-			//char --> byte
-//			String tmp=new String(buffer1,0,count1);
-//			buffer=tmp.getBytes();
-//			System.out.println("--11--"+tmp);
-//			final int count=buffer.length;
+		if (true) {			
 			int startPosition = 0;
 			try {
 				for (int i = -1;;) {
@@ -135,6 +127,7 @@ mainSwitchLabel:
 									break;
 							}
 							break;
+						case STYLE:
 						case SCRIPT:
 							while (true) {
 								if (buffer[++i] == '<') {
@@ -198,6 +191,10 @@ mainSwitchLabel:
 												scriptOpened = true;
 												state = SCRIPT;
 												break mainSwitchLabel;
+											}else if (stringTagName.equalsToLCString("style")) {
+												styleOpened = true;
+												state = STYLE;
+												break mainSwitchLabel;
 											}
 											/*if (stringTagName.equalsToLCString("html")) {
 												html = true;
@@ -235,11 +232,15 @@ mainSwitchLabel:
 												}
 												if (stringTagName.equalsToLCString("script")) {
 													scriptOpened = false;
+												}else if (stringTagName.equalsToLCString("style")) {
+													styleOpened = false;
 												}
 											}
 										if (scriptOpened){
 											state = SCRIPT;
-										} else {
+										}else if (styleOpened){
+											state = STYLE;
+										}else {
 											state = TEXT;
 											startPosition = i + 1;
 										}
@@ -255,6 +256,10 @@ mainSwitchLabel:
 										if (stringTagName.equalsToLCString("script")) {
 											scriptOpened = true;
 											state = SCRIPT;
+											break mainSwitchLabel;
+										}else if(stringTagName.equalsToLCString("style")) {
+											styleOpened = true;
+											state = STYLE;
 											break mainSwitchLabel;
 										}
 									}
@@ -287,11 +292,15 @@ mainSwitchLabel:
 										processEndTag(htmlReader, stringTagName);
 										if (stringTagName.equalsToLCString("script")) {
 											scriptOpened = false;
+										}else if (stringTagName.equalsToLCString("style")) {
+											styleOpened = false;
 										}
 									}
 									if (scriptOpened){
 										state = SCRIPT;
-									} else {
+									}else  if (styleOpened){
+										state = STYLE;
+									}else {
 										state = TEXT;
 										startPosition = i + 1;
 									}
@@ -375,6 +384,10 @@ mainSwitchLabel:
 										if (stringTagName.equalsToLCString("script")) {
 											scriptOpened = true;
 											state = SCRIPT;
+											break mainSwitchLabel;
+										}else if (stringTagName.equalsToLCString("style")) {
+											styleOpened = true;
+											state = STYLE;
 											break mainSwitchLabel;
 										}
 										state = TEXT;
@@ -467,6 +480,7 @@ mainSwitchLabel:
 						tagName.append(buffer, startPosition, count - startPosition);
 						break;
 					case ATTRIBUTE_NAME:
+//						System.out.println("-hym---mobi-----"+startPosition+"|"+count);
 						attributeName.append(buffer, startPosition, count - startPosition);
 						break;
 					case S_ATTRIBUTE_VALUE:
@@ -480,6 +494,451 @@ mainSwitchLabel:
 						entityName.append(buffer, startPosition, count - startPosition);
 						break;
 				}
+//				startPosition=0;
+			}
+			bufferOffset += count;
+		}
+	}    
+	public void doIt() throws IOException {
+		final InputStreamReader stream = myStream;
+		final ZLHtmlReader htmlReader = myReader;
+//		byte[] buffer = new byte[8192];
+		final ZLCharBuffer tagName = new ZLCharBuffer();
+		final ZLCharBuffer attributeName = new ZLCharBuffer();
+		final ZLCharBuffer attributeValue = new ZLCharBuffer();
+		final ZLCharBuffer entityName = new ZLCharBuffer();
+		final HashMap<ZLCharBuffer,ZLCharBuffer> strings = new HashMap<ZLCharBuffer,ZLCharBuffer>();
+		final ZLHtmlAttributeMap attributes = new ZLHtmlAttributeMap();
+		boolean scriptOpened = false;
+		boolean styleOpened = false;
+		//boolean html = false;
+		int bufferOffset = 0;
+		int offset = 0;
+		char[] buffertmp = new char[4096*2];
+		char[] buffer=null;
+		byte state = START_DOCUMENT;
+		while (true) {
+			final int count = stream.read(buffertmp);
+			if (count <= 0) {
+				return;
+			}
+			buffer=new char[count];
+			System.arraycopy(buffertmp, 0, buffer, 0, count);
+//			System.out.println("--11-read count-"+count);
+			
+//			if (count < buffer.length) {
+//				buffer = ZLArrayUtils.createCopy(buffer, count, count);
+//			}
+			//char --> byte
+//			String tmp=new String(buffer1,0,count1);
+//			buffer=tmp.getBytes();
+//			System.out.println("--11--"+tmp);
+//			final int count=buffer.length;
+			int startPosition = 0;
+			try {
+				for (int i = -1;;) {
+mainSwitchLabel:	
+					switch (state) {
+						case START_DOCUMENT:
+							while (buffer[++i] != '<') {}
+							state = LANGLE;
+							break;
+						case LANGLE:
+							offset = bufferOffset + i;
+							switch (buffer[++i]) {
+								case '/':
+									state = END_TAG;
+									startPosition = i + 1;
+									break;
+								case '!':
+								{
+									switch (buffer[++i]) {
+										case '-':
+											state = COMMENT_MINUS;
+											i--;
+											break;
+										default:
+											state = COMMENT;
+											break;
+									}
+								}
+								case '?':
+									state = COMMENT;
+									break;
+								default:
+									state = START_TAG;
+									startPosition = i;
+									break;
+							}
+							break;
+						case STYLE:
+						case SCRIPT:
+							while (true) {
+								if (buffer[++i] == '<') {
+									if (buffer[++i] == '/') {
+										state = END_TAG;
+										startPosition = i + 1;
+										break mainSwitchLabel;
+									}
+								}
+							}
+						case COMMENT_MINUS:
+						{
+							int minusCounter = 0;
+							while (minusCounter != 2) {
+								switch (buffer[++i]) {
+									case '-':
+										minusCounter++;
+										break;
+									default :
+										minusCounter = 0;
+										break;
+								}
+							}
+							switch (buffer[++i]) {
+								case '>':
+									state = TEXT;
+									startPosition = i + 1;
+									break mainSwitchLabel;
+							}
+						}
+						
+						case COMMENT :
+							while (true) {
+								switch (buffer[++i]) {
+									case '>':
+										state = TEXT;
+										startPosition = i + 1;
+										break mainSwitchLabel;
+								}
+							}
+						case START_TAG:
+							while (true) {
+								switch (buffer[++i]) {
+									case 0x0008:
+									case 0x0009:
+									case 0x000A:
+									case 0x000B:
+									case 0x000C:
+									case 0x000D:
+									case ' ':
+										state = WS_AFTER_START_TAG_NAME;
+										tagName.append(buffer, startPosition, i - startPosition);
+										break mainSwitchLabel;
+									case '>':
+										state = TEXT;
+										tagName.append(buffer, startPosition, i - startPosition);
+										{
+											ZLCharBuffer stringTagName = unique(strings, tagName);
+											processStartTag(htmlReader, stringTagName, offset, attributes);
+											if (stringTagName.equalsToLCString("script")) {
+												scriptOpened = true;
+												state = SCRIPT;
+												break mainSwitchLabel;
+											}else if (stringTagName.equalsToLCString("style")) {
+												styleOpened = true;
+												state = STYLE;
+												break mainSwitchLabel;
+											}
+											/*if (stringTagName.equalsToLCString("html")) {
+												html = true;
+											}*/
+										}
+										startPosition = i + 1;
+										break mainSwitchLabel;
+									case '/':
+										state = SLASH;
+										tagName.append(buffer, startPosition, i - startPosition);
+										//processFullTag(htmlReader, unique(strings, tagName), attributes);
+										break mainSwitchLabel;
+								}
+							}
+						case END_TAG:
+							while (true) {
+								switch (buffer[++i]) {
+									case 0x0008:
+									case 0x0009:
+									case 0x000A:
+									case 0x000B:
+									case 0x000C:
+									case 0x000D:
+									case ' ':
+										state = WS_AFTER_END_TAG_NAME;
+										tagName.append(buffer, startPosition, i - startPosition);
+										break mainSwitchLabel;
+									case '>':
+
+											tagName.append(buffer, startPosition, i - startPosition);
+											{
+												ZLCharBuffer stringTagName = unique(strings, tagName);
+												processEndTag(htmlReader, stringTagName);
+												if (scriptOpened){
+												}
+												if (stringTagName.equalsToLCString("script")) {
+													scriptOpened = false;
+												}else if (stringTagName.equalsToLCString("style")) {
+													styleOpened = false;
+												}
+											}
+										if (scriptOpened){
+											state = SCRIPT;
+										}else if (styleOpened){
+											state = STYLE;
+										}else {
+											state = TEXT;
+											startPosition = i + 1;
+										}
+										break mainSwitchLabel;
+								}
+							}
+						case WS_AFTER_START_TAG_NAME:
+							switch (buffer[++i]) {
+								case '>':
+									{
+										ZLCharBuffer stringTagName = unique(strings, tagName);
+										processStartTag(htmlReader, stringTagName, offset, attributes);
+										if (stringTagName.equalsToLCString("script")) {
+											scriptOpened = true;
+											state = SCRIPT;
+											break mainSwitchLabel;
+										}else if(stringTagName.equalsToLCString("style")) {
+											styleOpened = true;
+											state = STYLE;
+											break mainSwitchLabel;
+										}
+									}
+									state = TEXT;
+									startPosition = i + 1;
+									break;
+								case '/':
+									state = SLASH;
+									break;
+								case 0x0008:
+								case 0x0009:
+								case 0x000A:
+								case 0x000B:
+								case 0x000C:
+								case 0x000D:
+								case ' ':
+									break;
+								default:
+									state = ATTRIBUTE_NAME;
+									startPosition = i;
+									break;
+							}
+							break;
+							
+						case WS_AFTER_END_TAG_NAME:
+							switch (buffer[++i]) {
+								case '>':
+									{
+										ZLCharBuffer stringTagName = unique(strings, tagName);
+										processEndTag(htmlReader, stringTagName);
+										if (stringTagName.equalsToLCString("script")) {
+											scriptOpened = false;
+										}else if (stringTagName.equalsToLCString("style")) {
+											styleOpened = false;
+										}
+									}
+									if (scriptOpened){
+										state = SCRIPT;
+									}else  if (styleOpened){
+										state = STYLE;
+									}else {
+										state = TEXT;
+										startPosition = i + 1;
+									}
+									break;
+							}
+							break;
+							
+						case ATTRIBUTE_NAME:
+							while (true) {
+								switch (buffer[++i]) {
+									case '=':
+										attributeName.append(buffer, startPosition, i - startPosition);
+										state = WAIT_ATTRIBUTE_VALUE;
+										break mainSwitchLabel;
+									case 0x0008:
+									case 0x0009:
+									case 0x000A:
+									case 0x000B:
+									case 0x000C:
+									case 0x000D:
+									case ' ':
+										attributeName.append(buffer, startPosition, i - startPosition);
+										state = WAIT_EQUALS;
+										break mainSwitchLabel;
+								}
+							}
+						case WAIT_EQUALS:
+							while (true) {
+								switch (buffer[++i]) {
+									case '=':
+										state = WAIT_ATTRIBUTE_VALUE;
+										break mainSwitchLabel;
+								}
+							}
+						case WAIT_ATTRIBUTE_VALUE:
+							while (true) {
+								switch (buffer[++i]) {
+									case ' ' :
+										break;
+									case '\t' :
+										break;
+									case '\n' : 
+										break;
+									case '\'':
+										state = S_ATTRIBUTE_VALUE;
+										startPosition = i + 1;
+										break mainSwitchLabel;
+									case '"' :
+										state = D_ATTRIBUTE_VALUE;
+										startPosition = i + 1;
+										break mainSwitchLabel;
+									default :
+										state = DEFAULT_ATTRIBUTE_VALUE;
+										startPosition = i;
+										break mainSwitchLabel;
+								}
+							}
+						case DEFAULT_ATTRIBUTE_VALUE:
+							while (true) {
+								i++;
+								if ((buffer[i] == ' ') || (buffer[i] == '\'') 
+									|| (buffer[i] == '"') || (buffer[i] == '>')) {
+									attributeValue.append(buffer, startPosition, i - startPosition);
+									
+									attributes.put(unique(strings, attributeName), new ZLCharBuffer(attributeValue));
+									attributeValue.clear();
+								}
+								switch (buffer[i]) {
+									case ' ':
+									case '\'':
+									case '"':
+										state = WS_AFTER_START_TAG_NAME;
+										break mainSwitchLabel;
+									case '/':
+										state = SLASH;
+										break mainSwitchLabel;
+									case '>':
+										ZLCharBuffer stringTagName = unique(strings, tagName);
+										
+										processStartTag(htmlReader, stringTagName, offset, attributes);
+										if (stringTagName.equalsToLCString("script")) {
+											scriptOpened = true;
+											state = SCRIPT;
+											break mainSwitchLabel;
+										}else if (stringTagName.equalsToLCString("style")) {
+											styleOpened = true;
+											state = STYLE;
+											break mainSwitchLabel;
+										}
+										state = TEXT;
+										startPosition = i + 1;
+										break mainSwitchLabel;
+								}
+							}	
+						case D_ATTRIBUTE_VALUE:
+							while (true) {
+								switch (buffer[++i]) {
+									case '"':
+										attributeValue.append(buffer, startPosition, i - startPosition);
+										state = WS_AFTER_START_TAG_NAME;
+										attributes.put(unique(strings, attributeName), new ZLCharBuffer(attributeValue));
+										attributeValue.clear();
+										break mainSwitchLabel;
+								}
+							}
+							
+						case S_ATTRIBUTE_VALUE:
+							while (true) {
+								switch (buffer[++i]) {
+									case '\'':
+										attributeValue.append(buffer, startPosition, i - startPosition);
+										state = WS_AFTER_START_TAG_NAME;
+										attributes.put(unique(strings, attributeName), new ZLCharBuffer(attributeValue));
+										attributeValue.clear();
+										break mainSwitchLabel;
+								}
+							}
+						case SLASH:
+							while (true) {
+								switch (buffer[++i]) {
+									case ' ':
+										break;
+									case '>':
+										processFullTag(htmlReader, unique(strings, tagName), offset, attributes);
+										state = TEXT;
+										startPosition = i + 1;
+										break mainSwitchLabel;
+									default :
+										state = DEFAULT_ATTRIBUTE_VALUE;
+										break mainSwitchLabel;
+								}
+							}
+						case TEXT:
+							while (true) {
+								switch (buffer[++i]) {
+									case '<':
+										if (i > startPosition) {
+											htmlReader.charDataHandler(buffer, startPosition, i - startPosition);
+										}
+										state = LANGLE;
+										break mainSwitchLabel;
+									case '&':
+										if (i > startPosition) {
+											htmlReader.charDataHandler(buffer, startPosition, i - startPosition);
+										}
+										state = ENTITY_REF;
+										startPosition = i + 1;
+										break mainSwitchLabel;
+								}
+							}
+						case ENTITY_REF:
+							while (true) {
+								char sym = buffer[++i];
+								if (sym == ';') {
+									entityName.append(buffer, startPosition, i - startPosition);
+									state = TEXT;
+									startPosition = i + 1;
+									htmlReader.entityDataHandler(unique(strings, entityName).toString());
+									entityName.clear();
+									break mainSwitchLabel;
+								} else if ((sym != '#') && !Character.isLetterOrDigit(sym)) {
+									entityName.append(buffer, startPosition, i - startPosition);
+									state = TEXT;
+									startPosition = i;
+									htmlReader.charDataHandler(new char[] { '&' }, 0, 1);
+									htmlReader.charDataHandler(entityName.myData, 0, entityName.myLength);
+									entityName.clear();
+									break mainSwitchLabel;
+								}
+							}
+					}
+				}
+			} catch (ArrayIndexOutOfBoundsException e) {
+				switch (state) {
+					case START_TAG:
+					case END_TAG:
+						tagName.append(buffer, startPosition, count - startPosition);
+						break;
+					case ATTRIBUTE_NAME:
+//						System.out.println("-hym---mobi-----"+startPosition+"|"+count);
+						attributeName.append(buffer, startPosition, count - startPosition);
+						break;
+					case S_ATTRIBUTE_VALUE:
+					case D_ATTRIBUTE_VALUE:
+						attributeValue.append(buffer, startPosition, count - startPosition);
+						break;
+					case TEXT:
+						htmlReader.charDataHandler(buffer, startPosition, count - startPosition);
+						break;
+					case ENTITY_REF:
+						entityName.append(buffer, startPosition, count - startPosition);
+						break;
+				}
+//				startPosition=0;
 			}
 			bufferOffset += count;
 		}

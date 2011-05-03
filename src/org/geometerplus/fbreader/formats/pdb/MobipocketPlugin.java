@@ -57,7 +57,9 @@ public class MobipocketPlugin extends PdbPlugin {
 			}
 			final int length = (int)PdbUtil.readInt(stream);
 //			System.out.println("--------hym---"+length);
-			PdbUtil.skip(stream, 4);
+			long mobitype=PdbUtil.readInt(stream);
+			System.out.println("--------hym---mobitype:"+mobitype);
+//			PdbUtil.skip(stream, 4);
 			final int encodingCode = (int)PdbUtil.readInt(stream);
 			String encodingName = ZLEncodingCollection.Instance().getEncodingName(encodingCode);
 			if (encodingName == null) {
@@ -71,7 +73,7 @@ public class MobipocketPlugin extends PdbPlugin {
 			book.setLanguage(ZLLanguageUtil.languageByIntCode(languageCode & 0xFF, (languageCode >> 8) & 0xFF));
 			PdbUtil.skip(stream, 32);
 			int offset = 132;
-			if ((PdbUtil.readInt(stream) & 0x40) != 0) {
+			if ((PdbUtil.readInt(stream) & 0x40) != 0) {//if bit 6 (0x40) is set, then there's an EXTH record 
 				PdbUtil.skip(stream, length - 116);
 				offset = length + 20;
 				if (PdbUtil.readInt(stream) == 0x45585448) /* "EXTH" */ {

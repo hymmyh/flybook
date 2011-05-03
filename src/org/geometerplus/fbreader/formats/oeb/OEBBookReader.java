@@ -60,7 +60,7 @@ class OEBBookReader extends ZLXMLReaderAdapter implements XMLNamespaces {
 
 	private TreeMap<String,Integer> myFileNumbers = new TreeMap<String,Integer>();
 	private TreeMap<String,Integer> myTOCLabels = new TreeMap<String,Integer>();
-
+//hym 获取 epub 内容
 	boolean readBook(ZLFile file) {
 		myFilePrefix = MiscUtil.htmlDirectoryPrefix(file);
 
@@ -110,7 +110,7 @@ class OEBBookReader extends ZLXMLReaderAdapter implements XMLNamespaces {
 		}
 		return myModelReader.Model.getLabel(num + id.substring(index));
 	}
-
+	//hym  生成目录
 	private void generateTOC() {
 		if (myNCXTOCFileName != null) {
 			final NCXReader ncxReader = new NCXReader(myModelReader);

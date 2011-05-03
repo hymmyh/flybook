@@ -29,9 +29,9 @@ import android.net.Uri;
 
 import org.geometerplus.zlibrary.core.network.ZLNetworkException;
 
-import org.geometerplus.fbreader.network.NetworkLibrary;
-import org.geometerplus.fbreader.network.INetworkLink;
+import org.geometerplus.fbreader.network.*;
 import org.geometerplus.fbreader.network.authentication.NetworkAuthenticationManager;
+import org.geometerplus.fbreader.network.tree.NetworkBookTree;
 
 import org.geometerplus.android.util.PackageUtil;
 
@@ -49,7 +49,7 @@ abstract class Util implements UserRegistrationConstants {
 		return testService(
 			activity,
 			REGISTRATION_ACTION,
-			link.getLink(INetworkLink.URL_SIGN_UP)
+			link.getUrlInfo(INetworkLink.URL_SIGN_UP).URL
 		);
 	}
 
@@ -57,12 +57,12 @@ abstract class Util implements UserRegistrationConstants {
 		try {
 			final Intent intent = new Intent(
 				REGISTRATION_ACTION,
-				Uri.parse(link.getLink(INetworkLink.URL_SIGN_UP))
+				Uri.parse(link.getUrlInfo(INetworkLink.URL_SIGN_UP).URL)
 			);
 			if (PackageUtil.canBeStarted(activity, intent)) {
 				activity.startActivityForResult(new Intent(
 					REGISTRATION_ACTION,
-					Uri.parse(link.getLink(INetworkLink.URL_SIGN_UP))
+					Uri.parse(link.getUrlInfo(INetworkLink.URL_SIGN_UP).URL)
 				), USER_REGISTRATION_REQUEST_CODE);
 			}
 		} catch (ActivityNotFoundException e) {
@@ -93,7 +93,7 @@ abstract class Util implements UserRegistrationConstants {
 		return testService(
 			activity,
 			SMS_REFILLING_ACTION,
-			link.getLink(INetworkLink.URL_MAIN)
+			link.getUrlInfo(INetworkLink.URL_MAIN).URL
 		);
 	}
 
@@ -101,7 +101,7 @@ abstract class Util implements UserRegistrationConstants {
 		try {
 			final Intent intent = new Intent(
 				SMS_REFILLING_ACTION,
-				Uri.parse(link.getLink(INetworkLink.URL_MAIN))
+				Uri.parse(link.getUrlInfo(INetworkLink.URL_MAIN).URL)
 			);
 			final NetworkAuthenticationManager mgr = link.authenticationManager();
 			if (mgr != null) {
@@ -117,7 +117,7 @@ abstract class Util implements UserRegistrationConstants {
 	}
 
 	static boolean isBrowserAccountRefillingSupported(Activity activity, INetworkLink link) {
-		return link.getLink(INetworkLink.URL_REFILL_ACCOUNT) != null;
+		return link.getUrlInfo(INetworkLink.URL_REFILL_ACCOUNT).URL != null;
 	}
 
 	static void openInBrowser(Context context, String url) {
@@ -125,5 +125,22 @@ abstract class Util implements UserRegistrationConstants {
 			url = NetworkLibrary.Instance().rewriteUrl(url, true);
 			context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
 		}
+	}
+
+	private static final String TREE_KEY_KEY = "org.geometerplus.android.fbreader.network.TreeKey";
+
+	static void openTree(Context context, NetworkTree tree) {
+		final Class<?> clz = tree instanceof NetworkBookTree
+			? NetworkBookInfoActivity.class : NetworkCatalogActivity.class;
+		context.startActivity(
+			new Intent(context.getApplicationContext(), clz)
+				.putExtra(TREE_KEY_KEY, tree.getUniqueKey())
+		);
+	}
+
+	public static NetworkTree getTreeFromIntent(Intent intent) {
+		final NetworkLibrary library = NetworkLibrary.Instance();
+		final NetworkTree.Key key = (NetworkTree.Key)intent.getSerializableExtra(TREE_KEY_KEY);
+		return library.getTreeByKey(key);
 	}
 }

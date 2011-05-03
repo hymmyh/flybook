@@ -614,15 +614,32 @@ public abstract class ZLTextView extends ZLTextViewBase {
 			cursor.moveToParagraph(paragraphIndex);
 			wordIndex = cursor.getParagraphCursor().getParagraphLength();
 		}
-		int txtnum=computeTextPageNumber(intTextSize)+getCurrentPicNumber(paragraphIndex);//获得页码
-//		System.out.println("------hym---"+txtnum+"-"+computeTextPageNumber(intTextSize)+"-"+getCurrentPicNumber(paragraphIndex));
+		
+		//TODO 页码没有很完善的解决，主要是图片问题，特别图文混排，不知道图片的高度。
+		int allpagenum=computePageNumber();
+		int allpicnum=myModel.getPicNum();
+		int xs=1;//图文混排序数
+		if(allpagenum-allpicnum>10){
+			xs=allpagenum-allpicnum;
+		}
+		int txtnum=computeTextPageNumber(intTextSize)+getCurrentPicNumber(paragraphIndex)/xs;//获得页码
+		//导航 页码问题 全图  或 图文混排
+		//导航 中 全图片 全文字 ok
+		//图文混排有问题  ;原因是paragraphIndex 改变了，intTextSize 也会改变，但下面代码没有改变。
+		
 		while(txtnum-page>1){//有问题。可能是图片原因引起
-			if(paragraphIndex>0){
-				paragraphIndex--;
+			int num=(txtnum-page)/3;
+			if(num<1){
+				num=1;
+			}
+			if(paragraphIndex>1){
+				paragraphIndex-=num;
 			}else{
 				break;
 			}
-			txtnum=computeTextPageNumber(intTextSize)+getCurrentPicNumber(paragraphIndex);
+			intTextSize = myModel.getTextLength(paragraphIndex);
+			txtnum=computeTextPageNumber(intTextSize)+getCurrentPicNumber(paragraphIndex)/xs;
+//			System.out.println("--1----hym---"+txtnum+"-"+"-"+page+"="+computeTextPageNumber(intTextSize)+"+"+getCurrentPicNumber(paragraphIndex));
 		}
 		//进行比较
 		while(page-txtnum>1){//有问题。可能是图片原因引起
@@ -633,7 +650,9 @@ public abstract class ZLTextView extends ZLTextViewBase {
 			}else{
 				break;
 			}
-			txtnum=computeTextPageNumber(intTextSize)+getCurrentPicNumber(paragraphIndex);
+			intTextSize = myModel.getTextLength(paragraphIndex);
+			txtnum=computeTextPageNumber(intTextSize)+getCurrentPicNumber(paragraphIndex)/xs;
+//			System.out.println("--2----hym---"+txtnum+"-"+"-"+page+"="+computeTextPageNumber(intTextSize)+"-"+getCurrentPicNumber(paragraphIndex));
 		}
 		gotoPositionByEnd(paragraphIndex, wordIndex, 0);
 	}
@@ -793,7 +812,7 @@ public abstract class ZLTextView extends ZLTextViewBase {
 		} while (result.isEndOfParagraph() && result.nextParagraph() && !result.getParagraphCursor().isEndOfSection() && (textAreaHeight >= 0));
 		resetTextStyle();
 	}
-	//hym  重要
+	//hym  重要   每行数据 主要是高度 和宽度
 	private ZLTextLineInfo processTextLine(ZLTextParagraphCursor paragraphCursor,
 		final int startIndex, final int startCharIndex, final int endIndex) {
 		final ZLPaintContext context = myContext;

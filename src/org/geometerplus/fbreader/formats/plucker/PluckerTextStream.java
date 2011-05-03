@@ -81,7 +81,7 @@ public class PluckerTextStream extends PdbStream {
 			try {
 				processRecord(nextOffset - currentOffset);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				// 
 				e.printStackTrace();
 			}
 		}

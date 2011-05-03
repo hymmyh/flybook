@@ -2,7 +2,7 @@ package org.amse.ys.zip;
 
 import java.io.*;
 
-import org.geometerplus.fbreader.formats.txt.SinoDetect;
+import org.geometerplus.fbreader.formats.txt.JustEncoding;
 
 final class MyBufferedInputStream extends InputStream {
     private final ZipFile.InputStreamHolder myStreamHolder;
@@ -109,10 +109,10 @@ final class MyBufferedInputStream extends InputStream {
             array[i] = (byte)read(flag);
         }
       //hym 加，为了处理 文件名是中文的问题
-        int enc = new SinoDetect().detectEncoding(array);
-        System.out.println("-------hhh:"+enc);
+        int enc = new JustEncoding().detectEncoding(array);
+//        System.out.println("-------hhh:"+enc);
         
-        return new String(array,SinoDetect.nicename[enc]);
+        return new String(array,JustEncoding.nicename[enc]);
     }
     public void skip(int n) throws IOException {
         myCurrentPosition += n;

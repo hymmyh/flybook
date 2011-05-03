@@ -26,7 +26,7 @@ class ShowTOCAction extends RunActivityAction {
 		super(baseActivity, fbreader, TOCActivity.class);
 	}
 
-	public boolean isVisible() {
+	public boolean isVisible() {//hym 是否显示 目录
 		return (Reader.Model != null) && Reader.Model.TOCTree.hasChildren();
 	}
 }

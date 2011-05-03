@@ -203,7 +203,7 @@ public final class TxtReader extends BookReader implements ZLXMLReader {
             endParagraph();
             endDocumentHandler();
         } catch (Exception e1) {
-            // TODO Auto-generated catch block
+            // 
             e1.printStackTrace();
         } finally {
             try {
@@ -271,14 +271,14 @@ public final class TxtReader extends BookReader implements ZLXMLReader {
 
 	@Override
 	public void addExternalEntities(HashMap<String, char[]> entityMap) {
-		// TODO Auto-generated method stub
+		// 
 		
 	}
 
 
 	@Override
 	public void namespaceMapChangedHandler(Map<String, String> namespaces) {
-		// TODO Auto-generated method stub
+		// 
 		
 	}
 }

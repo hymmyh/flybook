@@ -12,7 +12,7 @@ import java.util.zip.ZipInputStream;
 
 import org.geometerplus.fbreader.bookmodel.BookModel;
 import org.geometerplus.fbreader.bookmodel.BookReader;
-import org.geometerplus.fbreader.formats.txt.SinoDetect;
+import org.geometerplus.fbreader.formats.txt.JustEncoding;
 import org.geometerplus.zlibrary.core.constants.MimeTypes;
 import org.geometerplus.zlibrary.core.filesystem.ZLFile;
 import org.geometerplus.zlibrary.core.image.ZLFileImage;
@@ -33,7 +33,7 @@ public class PdbReader extends BookReader implements ZLXMLReader {
 	private static byte[] ttb=new byte[0];
 	public PdbReader(BookModel model) {
 		super(model);
-		// TODO Auto-generated constructor stub
+		// 
 	}
 	public byte[] getContentBytes(int offset,ZLFile file,int length){
 		byte[] bytes = null;
@@ -58,7 +58,7 @@ public class PdbReader extends BookReader implements ZLXMLReader {
 				try {
 					is.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
 			}
@@ -101,7 +101,7 @@ public class PdbReader extends BookReader implements ZLXMLReader {
 				try {
 					is.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					// 
 					e.printStackTrace();
 				}
 			}
@@ -135,7 +135,7 @@ public class PdbReader extends BookReader implements ZLXMLReader {
 		try {
 			str=new String(tmpb,encodingName);
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
+			// 
 			e.printStackTrace();
 		}
 		return str;
@@ -206,7 +206,7 @@ bytes	content	comments
 //				String txttmp=new String(getContentBytes(header.Offsets[j],file.getPath(),length),header.encodingName);
 				byte[] btmp = getContentBytes(header.Offsets[j],file,length);
 				String txttmp="";
-				if(compressionflag){
+				if(compressionflag){//压缩
 					byte[] to= new byte[btmp.length+1024];
 					int tolen=DocDecompressor.decompress(btmp, to);
 //					System.out.println("-----hym --read pdb"+length+"|"+tolen);
@@ -315,7 +315,7 @@ bytes	content	comments
 	}
 	@Override
 	public void addExternalEntities(HashMap<String, char[]> entityMap) {
-		// TODO Auto-generated method stub
+		// 
 		
 	}
 
@@ -339,7 +339,7 @@ bytes	content	comments
 
 	@Override
 	public boolean dontCacheAttributeValues() {
-		// TODO Auto-generated method stub
+		// 
 		return false;
 	}
 
@@ -351,25 +351,25 @@ bytes	content	comments
 
 	@Override
 	public boolean endElementHandler(String tag) {
-		// TODO Auto-generated method stub
+		// 
 		return false;
 	}
 
 	@Override
 	public List<String> externalDTDs() {
-		// TODO Auto-generated method stub
+		// 
 		return null;
 	}
 
 	@Override
 	public void namespaceMapChangedHandler(Map<String, String> namespaces) {
-		// TODO Auto-generated method stub
+		// 
 		
 	}
 
 	@Override
 	public boolean processNamespaces() {
-		// TODO Auto-generated method stub
+		// 
 		return false;
 	}
 
@@ -381,7 +381,7 @@ bytes	content	comments
 
 	@Override
 	public boolean startElementHandler(String tag, ZLStringMap attributes) {
-		// TODO Auto-generated method stub
+		// 
 		return false;
 	}
 

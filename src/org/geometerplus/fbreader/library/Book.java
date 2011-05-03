@@ -192,6 +192,9 @@ public class Book {
 
 	public void addAuthor(String name, String sortKey) {
 		String strippedName = name;
+		if(strippedName==null){
+			strippedName="";
+		}
 		strippedName.trim();
 		if (strippedName.length() == 0) {
 			return;

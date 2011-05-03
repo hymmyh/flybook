@@ -179,7 +179,7 @@ public class PluckerBookReader extends BookReader {
 							decompressor.end();
 							myCharBuffer = new String(output, 0, size).toCharArray();
 						} catch (DataFormatException e) {
-							// TODO Auto-generated catch block
+							// 
 							//e.printStackTrace();
 							//System.out.println(e.getMessage());
 						}

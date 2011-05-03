@@ -242,6 +242,7 @@ final class ZLXMLParser {
 				System.arraycopy(buffer, 0, buffer, startPosition, count);
 				count = buffer.length;
 			}
+//			System.out.println("-- html--"+new String(buffer));
 			try {
 				for (int i = startPosition - 1;;) {
 mainSwitchLabel:

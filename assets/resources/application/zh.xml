@@ -10,8 +10,8 @@
 		<node name="byAuthor" value="作者">
 			<node name="summary" value="按作者排序" />
 		</node>
-		<node name="byTitle" value="标题" toBeTranslated="true"><!-- hym -->
-			<node name="summary" value="按标题排序" toBeTranslated="true"/><!-- hym -->
+		<node name="byTitle" value="标题" ><!-- hym -->
+			<node name="summary" value="按标题排序" /><!-- hym -->
 		</node>
 		<node name="byTag" value="标签">
 			<node name="summary" value="按标签排序"/>
@@ -48,6 +48,18 @@
 		<node name="removeFromFavorites" value="从收藏中移除"/>
 	</node>
 	<node name="networkView">
+		<node name="byAuthor" value="作者">
+			<node name="summary" value="按作者排序" />
+		</node>
+		<node name="byTitle" value="标题" >
+			<node name="summary" value="按标题排序" />
+		</node>
+		<node name="byDate" value="日期" >
+			<node name="summary" value="按购买日期排序" />
+		</node>
+		<node name="bySeries" value="系列" >
+			<node name="summary" value="按系列排序" />
+		</node>
 		<node name="openCatalog" value="打开书库目录" />
 		<node name="showResults" value="显示结果"/>
 		<node name="showBooks" value="显示书籍"/>
@@ -58,6 +70,8 @@
 		<node name="deleteDemo" value="删除试读本" />
 		<node name="downloadDemo" value="下载试读本" />
 		<node name="buy" value="购买(%s)" />
+		<node name="addToBasket" value="放入购物篮" />
+		<node name="removeFromBasket" value="从购物篮中去除" />
 		<node name="openInBrowser" value="在浏览器中打开" />
 		<node name="stopLoading" value="停止加载" />
 		<node name="stopSearching" value="停止搜索" />
@@ -110,6 +124,7 @@
 		<node name="series" value="系列:" />
 		<node name="indexInSeries" value="系列序号:" />
 		<node name="tags" value="标签:" />
+		<node name="catalog" value="书库:" />
 	</node>
 	<node name="bookInfo">
 		<node name="bookInfo" value="书籍信息" />
@@ -139,8 +154,8 @@
 		<node name="contentError" value="下载失败" />
 		<node name="downloadingStarted" value="开始下载" />
 		<node name="alreadyDownloading" value="已在下载" />
-		<node name="cannotCreateDirectory" value="不能创建目录 %s" toBeTranslated="true"/>
-		<node name="cannotCreateFile" value="不能创建文件 %s" toBeTranslated="true"/>
+		<node name="cannotCreateDirectory" value="不能创建目录 %s" />
+		<node name="cannotCreateFile" value="不能创建文件 %s" />
 		
 	</node>
 	<node name="tocView">
@@ -161,17 +176,17 @@
 		</node>
 	</node>
 	<node name="cancelMenu">
-		<node name="gotoLib" value="本地藏书" toBeTranslated="true"/>
-		<node name="previousBook" value="打开上一本书" toBeTranslated="true"/>
-		<node name="returnTo" value="返回到 ..." toBeTranslated="true"/>
-		<node name="close" value="关闭 FlyBook" toBeTranslated="true"/>
+		<node name="gotoLib" value="本地藏书" />
+		<node name="previousBook" value="打开上一本书" />
+		<node name="returnTo" value="返回到 ..." />
+		<node name="close" value="关闭 FlyBook" />
 	</node>
 	<node name="menu">
 		<node name="preferences" value="参数设置" />
 		<node name="bookInfo" value="书籍信息" />
 		<node name="library" value="本地藏书" />
 		<node name="toc" value="目录" />
-		<node name="day" value="白低黑字" />
+		<node name="day" value="白底黑字" />
 		<node name="night" value="黑底白字" />
 		<node name="networkLibrary" value="在线书库" />
 		<node name="navigate" value="导航">
@@ -233,7 +248,7 @@
 				<node name="summary" value="要查找文件的目录位置"/>
 				<node name="books" value="书文目录"/>
 				<node name="fonts" value="字体目录"/>
-				<node name="wallpapers" value="背景目录" toBeTranslated="true"/> <!-- hym -->
+				<node name="wallpapers" value="背景图片目录" /> <!-- hym -->
 			</node>
 			<node name="appearance" value="呈现方式">
 				<node name="summary" value="旋转，状态工具条"/>
@@ -244,6 +259,10 @@
 				<node name="showStatusBar" value="显示状态栏">
 					<node name="summaryOn" value="阅读模式下显示状态栏" />
 					<node name="summaryOff" value="阅读模式下隐藏状态栏" />
+				</node>
+				<node name="showStatusBarWhenMenuIsActive" value="弹出菜单时，是否显示状态栏" >
+					<node name="summaryOn" value="显示" />
+					<node name="summaryOff" value="不显示" />
 				</node>
 			</node>
 			<node name="text" value="文字">
@@ -396,15 +415,15 @@
 					</node>
 				</node>
 			</node>
-			<node name="colors" value="颜色 &amp; 背景" toBeTranslated="true"><!-- hym -->
+			<node name="colors" value="颜色 &amp; 背景" ><!-- hym -->
 				<node name="summary" value="设置颜色"/>
 				<node name="background" value="背景">
-					<node name="solidColor" value="使用背景色" toBeTranslated="true"/>
-					<node name="leather" value="Leather（图）" toBeTranslated="true"/>
-					<node name="sepia" value="Sepia（图）" toBeTranslated="true"/>
-					<node name="wood" value="Wood（图）" toBeTranslated="true"/>
+					<node name="solidColor" value="使用背景色" />
+					<node name="leather" value="Leather（图）" />
+					<node name="sepia" value="Sepia（图）" />
+					<node name="wood" value="Wood（图）" />
 				</node>
-				<node name="backgroundColor" value="背景色" toBeTranslated="true"/><!-- hym-->
+				<node name="backgroundColor" value="背景色" /><!-- hym-->
 				<node name="selectionBackground" value="选择背景色" />
 				<node name="text" value="普通文本" />
 				<node name="hyperlink" value="超链接文本" />
@@ -486,9 +505,9 @@
 					<node name="byFlick" value="手指触滑翻页"/>
 					<node name="byTapAndFlick" value="触滑或者拍触以翻页"/>
 				</node>
-				<node name="enableDoubleTapDetection" value="双击检查" toBeTranslated="true"><!-- hym-->
-					<node name="summaryOn" value="双击跳出菜单或对话框" toBeTranslated="true"/><!-- hym-->
-					<node name="summaryOff" value="忽略双击" toBeTranslated="true"/><!-- hym-->
+				<node name="enableDoubleTapDetection" value="双击检查" ><!-- hym-->
+					<node name="summaryOn" value="双击跳出菜单或对话框" /><!-- hym-->
+					<node name="summaryOff" value="忽略双击" /><!-- hym-->
 				</node>
 				<node name="volumeKeys" value="音量键滚动">
 					<node name="summaryOn" value="使用音量键翻页" />
@@ -498,10 +517,10 @@
 					<node name="summaryOn" value="允许上 (下) 键上(下)翻动页面"/>
 					<node name="summaryOff" value="禁止上 (下) 键上(下)翻动页面"/>
 				</node>
-				<node name="animation" value="翻页动画" toBeTranslated="true"><!-- hym-->
-					<node name="none" value="无动画效果" toBeTranslated="true"/><!-- hym-->
-					<node name="slide" value="单页滑动" toBeTranslated="true"/><!-- hym-->
-					<node name="shift" value="连接移动" toBeTranslated="true"/><!-- hym-->
+				<node name="animation" value="翻页动画" ><!-- hym-->
+					<node name="none" value="无动画效果" /><!-- hym-->
+					<node name="slide" value="单页滑动" /><!-- hym-->
+					<node name="shift" value="连接移动" /><!-- hym-->
 				</node>
 				<node name="horizontal" value="横向翻阅">
 					<node name="summaryOn" value="横向翻阅" />
@@ -519,6 +538,21 @@
 				<node name="navigateOverAllWords" value="导航键访问词句设定">
 					<node name="summaryOn" value="导航键访问所有的词句"/>
 					<node name="summaryOff" value="导航键仅访问超链接词句"/>
+				</node>
+			</node>
+			<node name="cancelMenu" value="返回菜单" >
+				<node name="summary" value="返回菜单条目" />
+				<node name="previousBook" value="上一本书" >
+					<node name="summaryOn" value="显示返回上一本书" />
+					<node name="summaryOff" value="不显示返回上一本书" />
+				</node>
+				<node name="positions" value="最后3条书签" >
+					<node name="summaryOn" value="显示这本书的最后3条书签" />
+					<node name="summaryOff" value="不显示这本书的书签" />
+				</node>
+				<node name="gotoLib" value="本地藏书" >
+					<node name="summaryOn" value="显示返回本地藏书" />
+					<node name="summaryOff" value="不显示返回本地藏书" />
 				</node>
 			</node>
 		</node>
@@ -571,10 +605,7 @@
 			<node name="noRequiredInformation" value="书库目录中必须的信息没有定义" />
 			<node name="cacheDirectoryError" value="无法创建缓存目录" />
 		</node>
-		<node name="emptyCatalogBox">
-			<node name="title" value="信息" />
-			<node name="message" value="空书库目录" />
-		</node>
+		
 		<node name="emptySearchResults">
 			<node name="title" value="搜索结果" />
 			<node name="message" value="没有找到对应的书籍." />
@@ -622,6 +653,8 @@
 		<node name="dictionaryIsNotInstalled" value="抱歉，你没有安装字典."/>
 		<node name="permissionDenied" value="对不起，没有权限"/>
 		<node name="noFavorites" value="对不起，你的收藏列表为空"/>
+		<node name="emptyCatalog" value="空书库目录"/>
+		<node name="emptyBasket" value="对不起你的购物蓝为空" />
 	</node>
 	<node name="external">
 		<node name="browser" value="浏览器" />

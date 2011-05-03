@@ -96,6 +96,13 @@ public final class FBReaderApp extends ZLApplication {
 
 	final ZLStringOption ColorProfileOption =
 		new ZLStringOption("Options", "ColorProfile", ColorProfile.DAY);
+	
+	public final ZLBooleanOption ShowPreviousBookInCancelMenuOption =
+		new ZLBooleanOption("CancelMenu", "previousBook", false);
+	public final ZLBooleanOption ShowPositionsInCancelMenuOption =
+		new ZLBooleanOption("CancelMenu", "positions", true);
+	public final ZLBooleanOption ShowGotoLibInCancelMenuOption =   //hym 返回的本地藏书
+		new ZLBooleanOption("CancelMenu", "positions", true);
 
 	private final ZLKeyBindings myBindings = new ZLKeyBindings("Keys");
 
@@ -350,24 +357,26 @@ public final class FBReaderApp extends ZLApplication {
 
 	public List<CancelActionDescription> getCancelActionsList() {
 		myCancelActionsList.clear();
-		final Book previousBook = Library.getPreviousBook();
-		
-		if (previousBook != null) {
-			myCancelActionsList.add(new CancelActionDescription(
-				CancelActionType.previousBook, previousBook.getTitle()
-			));
-		}
-		if (Model != null && Model.Book != null) {
-//			System.out.println("---add book mark----");
-			for (Bookmark bookmark : Bookmark.invisibleBookmarks(Model.Book)) {
-//				System.out.println("---add book mark----"+bookmark.getText());
-				myCancelActionsList.add(new BookmarkDescription(bookmark));
-				
+		if (ShowPreviousBookInCancelMenuOption.getValue()) {
+			final Book previousBook = Library.getPreviousBook();
+			if (previousBook != null) {
+				myCancelActionsList.add(new CancelActionDescription(
+					CancelActionType.previousBook, previousBook.getTitle()
+				));
 			}
 		}
-		myCancelActionsList.add(new CancelActionDescription(
-				CancelActionType.gotoLib, null
-			));
+		if (ShowPositionsInCancelMenuOption.getValue()) {
+			if (Model != null && Model.Book != null) {
+				for (Bookmark bookmark : Bookmark.invisibleBookmarks(Model.Book)) {
+					myCancelActionsList.add(new BookmarkDescription(bookmark));
+				}
+			}
+		}
+		if (ShowGotoLibInCancelMenuOption.getValue()) {
+			myCancelActionsList.add(new CancelActionDescription(
+					CancelActionType.gotoLib, null
+				));
+		}
 		myCancelActionsList.add(new CancelActionDescription(
 			CancelActionType.close, null
 		));
@@ -415,22 +424,22 @@ public final class FBReaderApp extends ZLApplication {
 			}
 		}
 	}
-
+	//也是添加返回书签，在书签中不显示的。导航中跳转用。
 	public void addInvisibleBookmark(ZLTextWordCursor cursor) {
 		if (cursor != null && Model != null && Model.Book != null && getTextView() == BookTextView) {
 			updateInvisibleBookmarksList(new Bookmark(
 				Model.Book,
 				getTextView().getModel().getId(),
 				cursor,
-				6,
+				10,
 				false
 			));
 		}
 	}
-	//怎么添加 这个 返回菜单中的 书签？？？
+	//怎么添加 这个 返回菜单中的 书签？？？；返回书签 由 6-10
 	public void addInvisibleBookmark() {
 		if (Model.Book != null && getTextView() == BookTextView) {
-			updateInvisibleBookmarksList(addBookmark(6, false));
+			updateInvisibleBookmarksList(addBookmark(10, false));
 		}
 	}
 

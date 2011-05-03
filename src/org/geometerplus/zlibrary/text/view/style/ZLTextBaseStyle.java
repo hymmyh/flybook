@@ -42,7 +42,7 @@ public class ZLTextBaseStyle extends ZLTextStyle {
 	public final ZLIntegerRangeOption AlignmentOption =
 		new ZLIntegerRangeOption(GROUP, "Base:alignment", 1, 4, ZLTextAlignmentType.ALIGN_JUSTIFY);
 	public final ZLIntegerRangeOption LineSpaceOption =
-		new ZLIntegerRangeOption(GROUP, "Base:lineSpacing", 5, 20, 12);
+		new ZLIntegerRangeOption(GROUP, "Base:lineSpacing", 5, 20, 13);// hym  行间距 1.3
 
 	public final ZLStringOption FontFamilyOption;
 	public final ZLIntegerRangeOption FontSizeOption;

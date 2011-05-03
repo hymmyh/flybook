@@ -25,6 +25,7 @@ import java.nio.charset.CharsetDecoder;
 
 import org.geometerplus.zlibrary.core.constants.MimeTypes;
 import org.geometerplus.zlibrary.core.image.ZLFileImage;
+import org.geometerplus.zlibrary.core.filesystem.ZLFile;
 import org.geometerplus.zlibrary.core.html.ZLCharBuffer;
 import org.geometerplus.zlibrary.core.html.ZLHtmlAttributeMap;
 
@@ -35,7 +36,9 @@ import org.geometerplus.fbreader.bookmodel.BookModel;
 public class MobipocketHtmlBookReader extends HtmlReader {
 	private final CharsetDecoder myTocDecoder;
 	private MobipocketStream myMobipocketStream;
-
+	private static boolean compressionflag = false;//要从第一条记录中的数据来判断是否用了压缩。
+	private static long txtlen=0;
+	
 	MobipocketHtmlBookReader(BookModel model) throws UnsupportedEncodingException {
 		super(model);
 		myTocDecoder = createDecoder();
@@ -45,7 +48,10 @@ public class MobipocketHtmlBookReader extends HtmlReader {
 		myMobipocketStream = new MobipocketStream(Model.Book.File);
 		return myMobipocketStream;
 	}
-
+	public InputStreamReader getInputStreamReader() throws IOException {
+//		System.out.println("---12---"+Model.Book.getEncoding());
+		return new InputStreamReader(getInputStream(),Model.Book.getEncoding());
+	}
 	private boolean myReadGuide;
 	private int myTocStartOffset = Integer.MAX_VALUE;
 	private int myTocEndOffset = Integer.MAX_VALUE;
@@ -58,7 +64,68 @@ public class MobipocketHtmlBookReader extends HtmlReader {
 	private boolean tocRangeContainsPosition(int position) {
 		return (myTocStartOffset <= position) && (position < myTocEndOffset);
 	}
-
+	public void getcompressionflag(int offset,ZLFile file){
+		byte[] bytes = null;
+		InputStream is = null;
+//		FileInputStream fis = file.getInputStream();
+//	    ZipInputStream zin = new ZipInputStream(is);
+		try{
+			is = file.getInputStream();
+//			ZipInputStream zin = new ZipInputStream(is);
+//			if(zin.getNextEntry()==null){
+//				System.out.println("--zip dec err--");
+//			}
+			long skipLength= offset;
+			is.skip(skipLength);
+//			int length = (int) contentArr.get(index).getLength();
+			bytes = new byte[2];
+			is.read(bytes);
+//			System.out.println("--bytes[1]---"+bytes[1]);
+			if(bytes[1]==2){
+				compressionflag=true;
+			}else{
+				compressionflag=false;
+			}
+			is.skip(2);//跳过2个
+			byte[] tmp = new byte[4];//长度 没有压缩的文本
+			is.read(tmp);
+			txtlen=(((long)(tmp[0] & 0xFF)) << 24) +
+			  + ((tmp[1] & 0xFF) << 16) +
+			  + ((tmp[2] & 0xFF) << 8) +
+			  + (tmp[3] & 0xFF);
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			if(is != null){
+				try {
+					is.close();
+				} catch (IOException e) {
+					// 
+					e.printStackTrace();
+				}
+			}
+		}
+		
+	}
+//	@Override
+//	public boolean readBook() throws IOException{
+//		InputStream stream = null;
+//		startDocumentHandler();
+////		boolean compressionflag = false;//要从第一条记录中的数据来判断是否用了压缩。
+//		
+//		try {
+//			stream = Model.Book.File.getInputStream();
+//			final PdbHeader header = new PdbHeader(stream);
+//			String tmpstr="";
+//            boolean flag1 = false;
+//            int pageNum = header.Offsets.length;
+//            getcompressionflag(header.Offsets[0],Model.Book.File);
+//            System.out.println("-----hym-mobi--"+compressionflag+"|"+txtlen);
+//		}catch(Exception e){
+//			e.printStackTrace();
+//		}
+//		return super.readBook();
+//	}
 	@Override
 	public void startElementHandler(byte tag, int offset, ZLHtmlAttributeMap attributes) {
 		final int paragraphIndex = Model.BookTextModel.getParagraphsNumber();
@@ -172,7 +239,14 @@ public class MobipocketHtmlBookReader extends HtmlReader {
 	@Override
 	public void startDocumentHandler() {
 		super.startDocumentHandler();
-
+		if(myMobipocketStream==null){
+			try {
+				getInputStream();
+			} catch (IOException e) {
+				// 
+				e.printStackTrace();
+			}
+		}
 		for (int index = 0; ; ++index) {
 			final int offset = myMobipocketStream.getImageOffset(index);
 			if (offset < 0) {
@@ -182,7 +256,12 @@ public class MobipocketHtmlBookReader extends HtmlReader {
 			if (length <= 0) {
 				break;
 			}
+			try
+			{
 			addImage("" + (index+1), new ZLFileImage(MimeTypes.MIME_IMAGE_AUTO, Model.Book.File, offset, length));
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 	}
 

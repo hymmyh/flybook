@@ -23,7 +23,7 @@ public class UmdReader extends BookReader implements ZLXMLReader {
 	private UMDFile umdFile;
 	public UmdReader(BookModel model) {
 		super(model);
-		// TODO Auto-generated constructor stub
+		// 
 	}
 	boolean readBook(ZLFile file) {
 		umdFile = new UMDFile();
@@ -158,7 +158,7 @@ public class UmdReader extends BookReader implements ZLXMLReader {
 	}
 	@Override
 	public void addExternalEntities(HashMap<String, char[]> entityMap) {
-		// TODO Auto-generated method stub
+		// 
 		
 	}
 
@@ -182,7 +182,7 @@ public class UmdReader extends BookReader implements ZLXMLReader {
 
 	@Override
 	public boolean dontCacheAttributeValues() {
-		// TODO Auto-generated method stub
+		// 
 		return false;
 	}
 
@@ -194,25 +194,25 @@ public class UmdReader extends BookReader implements ZLXMLReader {
 
 	@Override
 	public boolean endElementHandler(String tag) {
-		// TODO Auto-generated method stub
+		// 
 		return false;
 	}
 
 	@Override
 	public List<String> externalDTDs() {
-		// TODO Auto-generated method stub
+		// 
 		return null;
 	}
 
 	@Override
 	public void namespaceMapChangedHandler(Map<String, String> namespaces) {
-		// TODO Auto-generated method stub
+		// 
 		
 	}
 
 	@Override
 	public boolean processNamespaces() {
-		// TODO Auto-generated method stub
+		// 
 		return false;
 	}
 
@@ -224,7 +224,7 @@ public class UmdReader extends BookReader implements ZLXMLReader {
 
 	@Override
 	public boolean startElementHandler(String tag, ZLStringMap attributes) {
-		// TODO Auto-generated method stub
+		// 
 		return false;
 	}
 

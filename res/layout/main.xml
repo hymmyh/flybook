@@ -5,7 +5,7 @@
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 >
-	<org.geometerplus.zlibrary.ui.android.view.ZLAndroidWidget
+	<org.geometerplus.zlibrary.ui.androidfly.view.ZLAndroidWidget
 		android:id="@+id/main_view"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"

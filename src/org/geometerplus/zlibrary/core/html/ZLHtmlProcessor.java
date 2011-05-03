@@ -23,13 +23,37 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import org.geometerplus.fbreader.bookmodel.FBTextKind;
+
 public abstract class ZLHtmlProcessor {
+	public static boolean readchm(ZLHtmlReader reader, InputStreamReader stream,char[] buffer) {
+		try {
+			ZLHtmlParser parser = new ZLHtmlParser(reader, stream);
+			reader.startDocumentHandler();
+			parser.doIt(buffer);
+			reader.endDocumentHandler();
+		} catch (IOException e) {
+			return false;
+		}
+		return true;
+	}
 	public static boolean read(ZLHtmlReader reader, InputStreamReader stream) {
 		try {
 			ZLHtmlParser parser = new ZLHtmlParser(reader, stream);
 			reader.startDocumentHandler();
 			parser.doIt();
 			reader.endDocumentHandler();
+		} catch (IOException e) {
+			return false;
+		}
+		return true;
+	}
+	public static boolean readchmtxt(ZLHtmlReader reader, InputStreamReader stream) {
+		try {
+			ZLHtmlParser parser = new ZLHtmlParser(reader, stream);
+			
+			parser.doIt();
+			
 		} catch (IOException e) {
 			return false;
 		}

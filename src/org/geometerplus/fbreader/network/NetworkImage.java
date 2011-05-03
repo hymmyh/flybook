@@ -144,7 +144,7 @@ public final class NetworkImage extends ZLLoadableImage implements MimeTypes {
 	public String getId() {
 		return Url;
 	}
-	
+
 	public String getURI() {
 		// TODO: implement
 		return null;

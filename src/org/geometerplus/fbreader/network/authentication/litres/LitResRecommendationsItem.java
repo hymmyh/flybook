@@ -24,12 +24,14 @@ import java.util.Map;
 import org.geometerplus.zlibrary.core.util.ZLNetworkUtil;
 
 import org.geometerplus.fbreader.network.INetworkLink;
+import org.geometerplus.fbreader.network.Basket;
 import org.geometerplus.fbreader.network.NetworkBookItem;
 import org.geometerplus.fbreader.network.opds.OPDSCatalogItem;
+import org.geometerplus.fbreader.network.opds.OPDSNetworkLink;
 
 public class LitResRecommendationsItem extends OPDSCatalogItem {
 	public LitResRecommendationsItem(INetworkLink link, String title, String summary, String cover, Map<Integer,String> urlByType, Accessibility accessibility) {
-		super(link, title, summary, cover, urlByType, accessibility, CatalogType.BY_SERIES);
+		super(link, title, summary, cover, urlByType, accessibility, FLAGS_DEFAULT & ~FLAGS_GROUP);
 	}
 
 	@Override
@@ -45,6 +47,17 @@ public class LitResRecommendationsItem extends OPDSCatalogItem {
 				flag = true;
 			}
 			builder.append(book.Id);
+		}
+		final Basket basket = Link.basket();
+		if (basket != null) {
+			for (String bookId : basket.bookIds()) {
+				if (flag) {
+					builder.append(',');
+				} else {
+					flag = true;
+				}
+				builder.append(bookId);
+			}
 		}
 
 		return ZLNetworkUtil.appendParameter(URLByType.get(URL_CATALOG), "ids", builder.toString());

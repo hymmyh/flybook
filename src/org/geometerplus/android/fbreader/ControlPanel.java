@@ -25,7 +25,7 @@ import android.view.*;
 import android.view.animation.AlphaAnimation;
 import android.widget.*;
 
-import org.geometerplus.zlibrary.ui.android.R;
+import org.geometerplus.zlibrary.ui.androidfly.R;
 
 import org.geometerplus.zlibrary.core.application.ZLApplication;
 

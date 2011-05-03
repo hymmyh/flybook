@@ -2,14 +2,42 @@
 <FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink"><description><title-info><author><last-name>FlyBook</last-name></author> <book-title>关于FlyBook</book-title> <lang>zh</lang></title-info></description>
 <body>
 
-<title><p>关于FlyBook 0.99.10.1</p></title>
-<p>FlyBook是一款基于<a l:href="http://www.android.com/">Android</a>平台的电子书阅读软件，是开发者在<a l:href="http://www.fbreader.org/FBReaderJ/">FBReaderJ（0.99.10版本）</a>阅读软件的基础上用java语言编写的版本；未来升级版本将继续支持原始的FBReaderJ功能.</p>
-<p>通过FlyBook阅读软件，您可以享受更多的阅读乐趣。您可以根据需要任意设置颜色，字体，按键绑定或者是更改对话框中的其他属性。</p>
+<title><p>关于FlyBook 0.99.15.6b</p></title>
+<p>FlyBook是一款基于<a l:href="http://www.android.com/">Android</a>平台的电子书阅读软件，是开发者在<a l:href="http://www.fbreader.org/FBReaderJ/">FBReaderJ（0.99.13版本）</a>阅读软件的基础上用java语言编写的版本；未来升级版本将继续支持原始的FBReaderJ功能.</p>
+<p>通过FlyBook阅读软件，您可以享受更多的阅读乐趣。目前支持电子书格式：Txt，Chm， Htm/Html，Umd，Pdb/Mobi，ePub，Fb/Fb2。</p>
 <empty-line/>
+<p>十分感谢各位网络email过来反馈问题！！！</p>
 <subtitle><p>FlyBook更新内容</p></subtitle>
+<p>-----------2011-03-12------------</p>
+<p>● 基础版本更新到0.99.15</p>
+<p>-----------2011-03-04------------</p>
+<p>● 处理chm电子书阅读的bug</p>
+<p>-----------2011-02-27------------</p>
+<p>● 处理chm电子书阅读  ok</p>
+<p>-----------2011-02-26------------</p>
+<p>● 处理chm电子书阅读？？？</p>
+<p>●修改Canvas: trying to use a recycled bitmap bug。？？</p>
+<p>-----------2011-02-23------------</p>
+<p>●修改一些bug。</p>
+<p>-----------2011-02-18------------</p>
+<p>● 处理mobi电子书阅读的bug</p>
+<p>● 支持mobi中文标准 类型电子书</p>
+<p>-----------2011-02-14------------</p>
+<p>● 基础升级到0.99.13</p>
+<p>● 支持pdb 标准 类型电子书</p>
+<p>-----------2011-02-09------------</p>
+<p>● 基础升级到0.99.12</p>
+<p>---2011-02-08----------</p>
+<p>●修改一些bug。zip文件中文乱码。</p>
+<p>●删除记录，不删除文件功能。</p>
+<p>---2011-02-05----------</p>
+<p>●添加 打开软件密码功能。</p>
+<p>-----------2011-02-03------------</p>
+<p>● 基础升级到0.99.11</p>
+<p>● 退出菜单中加了一项跳转到本地藏书</p>
 <p>-----------2011-01-31------------</p>
 <p>● 支持更多的电子书格式：如 txt， htm，umd。</p>
-<p>● 如果选择智能加载，TXT，UMD 中文段落将智能处理，不过加载速度将变慢。</p>
+<p>● 如果选择智能加载，TXT，UMD，htm 中文段落将智能处理（处理被写字板等分开的段落），加载速度将稍慢。</p>
 <p>● 修改epub中的图片浏览功能；图显示更大，更清楚。</p>
 <p>● 修改纯图片文档的书签功能。</p>
 <empty-line/>
@@ -21,8 +49,7 @@
 <empty-line/>
 <subtitle><p>相关网站</p></subtitle>
 <p>有关FBReaderJ的信息可以在<a l:href="http://www.fbreader.org/FBReaderJ/">FBReaderJ</a>网站查阅到。</p>
-<p>  如果您想知道FlyBook的最新版本信息，请email：hymmyh@gmail.com。</p>
-<p>  如果您有任何的问题或建议，请使用email：hymmyh@gmail.com。</p>
+<p>  如果您想知道FlyBook的最新版本信息或有任何的问题或建议，请关注微博<a l:href="http://t.sina.com.cn/iflybook">iflybook</a>。</p>
 </body>
 </FictionBook>
 

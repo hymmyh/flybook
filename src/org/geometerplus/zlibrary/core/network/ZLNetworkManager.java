@@ -39,20 +39,22 @@ public class ZLNetworkManager {
 		}
 		return ourManager;
 	}
-
+	//网络书库 的提交数据设置。User-Agent 等
 	private void setCommonHTTPOptions(ZLNetworkRequest request, HttpURLConnection httpConnection) throws ZLNetworkException {
 		httpConnection.setInstanceFollowRedirects(request.FollowRedirects);
 		httpConnection.setConnectTimeout(15000); // FIXME: hardcoded timeout value!!!
 		httpConnection.setReadTimeout(30000); // FIXME: hardcoded timeout value!!!
 		//httpConnection.setRequestProperty("Connection", "Close");
-		httpConnection.setRequestProperty("User-Agent", ZLNetworkUtil.getUserAgent());
+		httpConnection.setRequestProperty("User-Agent", ZLNetworkUtil.getUserAgent());//hym 注释，设置客户端，服务器那边会认证
+		System.out.println("------http option--User-Agent:"+ZLNetworkUtil.getUserAgent());//
+		System.out.println("------http option--SSLCertificate:"+request.SSLCertificate);
 		httpConnection.setAllowUserInteraction(false);
 		if (httpConnection instanceof HttpsURLConnection) {
 			HttpsURLConnection httpsConnection = (HttpsURLConnection) httpConnection;
 			if (request.SSLCertificate != null) {
 				InputStream stream;
 				try {
-					ZLResourceFile file = ZLResourceFile.createResourceFile(request.SSLCertificate);
+					ZLResourceFile file = ZLResourceFile.createResourceFile(request.SSLCertificate);//hym 注释，ssl证书
 					stream = file.getInputStream();
 				} catch (IOException ex) {
 					throw new ZLNetworkException(ZLNetworkException.ERROR_SSL_BAD_FILE, request.SSLCertificate);
@@ -89,6 +91,7 @@ public class ZLNetworkManager {
 			int response = -1;
 			for (int retryCounter = 0; retryCounter < 3 && response == -1; ++retryCounter) {
 				final URLConnection connection = new URL(request.URL).openConnection();
+				System.out.println("---http-1--"+request.URL+"|"+request.PostData);
 				if (!(connection instanceof HttpURLConnection)) {
 					throw new ZLNetworkException(ZLNetworkException.ERROR_UNSUPPORTED_PROTOCOL);
 				}
